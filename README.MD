@@ -165,3 +165,11 @@ This project is designed as a **large-scale learning project** focusing on real-
 ## 📌 License
 
 This project is open-source and intended for educational use. MIT LICENSE
+
+---
+
+## IMPORTANT NOTE !!!
+
+Some Parts In this Project (Client Only) Made with AI But Only Ui Elements not Logic
+
+---
