@@ -61,7 +61,6 @@ const Home = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Header />
 
       {/* Main Content */}
       <Box

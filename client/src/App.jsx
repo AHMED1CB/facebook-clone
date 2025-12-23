@@ -7,6 +7,8 @@ import Register from "./components/Auth/Register/Register";
 import Login from "./components/Auth/Login/Login";
 import themeChanger from "./App/Context/ThemeChangerContext";
 import Home from "./components/Home/Home";
+import Videos from "./components/Videos/Videos";
+import MainLayout from "./Layouts/MainLayout";
 function App() {
   const [mode, setMode] = useState(localStorage.mode ?? "light");
 
@@ -18,8 +20,9 @@ function App() {
         <CssBaseline />
         <themeChanger.Provider value={{ mode, setMode }}>
           <Routes>
-            <Route path="/">
+            <Route path="/" element={<MainLayout/>}>
               <Route index element={<Home />} />
+              <Route path="videos" element={<Videos/>} />
             </Route>
 
             <Route path="/auth">
