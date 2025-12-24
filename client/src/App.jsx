@@ -10,6 +10,8 @@ import Home from "./components/Home/Home";
 import Videos from "./components/Videos/Videos";
 import MainLayout from "./Layouts/MainLayout";
 import Profile from "./components/Profile/Profile";
+import SearchResults from "./components/Search/SearchResults";
+import NotFound from "./components/States/404";
 function App() {
   const [mode, setMode] = useState(localStorage.mode ?? "light");
 
@@ -25,12 +27,14 @@ function App() {
               <Route index element={<Home />} />
               <Route path="videos" element={<Videos/>} />
               <Route path="profile" element={<Profile/>} />
+              <Route path="search/:query" element={<SearchResults/>} />
             </Route>
 
             <Route path="/auth">
               <Route path="register" element={<Register />} />
               <Route path="login" element={<Login />} />
             </Route>
+            <Route path="*" element={<NotFound/>}/>
           </Routes>
         </themeChanger.Provider>
       </ThemeProvider>

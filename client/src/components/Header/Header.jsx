@@ -89,6 +89,7 @@ export default () => {
               }}
             >
               <SearchIcon sx={{ color: theme.palette.text.secondary, mr: 1 }} />
+              
               <InputBase
                 placeholder="Search Facebook"
                 sx={{
@@ -99,7 +100,10 @@ export default () => {
                     opacity: 1,
                   },
                 }}
+
+                onKeyDown={(e) => {if (e.key === 'Enter' && e.target.value.trim()) {go(`/search/${e.target.value}`)}}}
               />
+
             </Box>
           </Box>
 
