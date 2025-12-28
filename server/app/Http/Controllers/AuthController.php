@@ -14,7 +14,7 @@ class AuthController extends Controller
     function getUserDetails()
     {
 
-        return request()->user;
+        return request()->user();
 
     }
 
