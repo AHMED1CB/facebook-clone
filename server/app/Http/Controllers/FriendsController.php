@@ -20,7 +20,7 @@ class FriendsController extends Controller
         }
 
         return Response::json([
-            'data' => $friend->friend
+            'friend' => $friend->friend
         ], "Friend Found Successfully", 200);
 
 

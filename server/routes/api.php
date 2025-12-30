@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FriendsController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RequestsController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,12 @@ Route::prefix('friends')->middleware('auth.facebook')->controller(FriendsControl
     Route::get('/{userId}/', 'getFriendData');
     Route::delete('/{userId}/', 'deleteFriend');
 
+});
+
+
+Route::prefix('posts')->middleware('auth.facebook')->controller(PostController::class)->group(function () {
+
+    Route::get('/{postId}', 'getPostDetails');
 
 });
 

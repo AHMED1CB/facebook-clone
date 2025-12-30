@@ -14,7 +14,9 @@ class AuthController extends Controller
     function getUserDetails()
     {
 
-        return request()->user();
+        return Response::json([
+            'user' => request()->user()
+        ], "Success", 200);
 
     }
 

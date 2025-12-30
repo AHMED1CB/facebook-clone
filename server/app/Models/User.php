@@ -50,7 +50,7 @@ class User extends Authenticatable
         return $this->hasMany(Friend::class);
     }
 
-    
+
 
 
     public function recivedRequests()
@@ -60,5 +60,11 @@ class User extends Authenticatable
     public function sentRequests()
     {
         return $this->hasMany(Request::class, 'from_id');
+    }
+
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
     }
 }

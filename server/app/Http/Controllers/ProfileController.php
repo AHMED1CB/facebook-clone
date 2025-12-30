@@ -62,9 +62,7 @@ class ProfileController extends Controller
 
 
         return Response::json([
-            'data' => [
-                'user' => $user->fresh()
-            ]
+            'user' => $user->fresh()
         ], "User Updated Successfully", 200);
 
     }
