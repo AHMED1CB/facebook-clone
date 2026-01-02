@@ -43,7 +43,11 @@ Route::prefix('friends')->middleware('auth.facebook')->controller(FriendsControl
 Route::prefix('posts')->middleware('auth.facebook')->controller(PostController::class)->group(function () {
 
     Route::get('/{postId}', 'getPostDetails');
+
     Route::post('/', 'uploadPost');
+
+    Route::delete('/{postId}', 'deletePost');
+
 
 });
 

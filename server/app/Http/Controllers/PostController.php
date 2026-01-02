@@ -108,6 +108,23 @@ class PostController extends Controller
 
         }
 
+    }
+
+
+    public function deletePost($postId)
+    {
+
+        $targetPost = request()->user()->posts()->whereId($postId)->first();
+
+        if (!$targetPost) {
+            return Response::json([], "Post With This Id Not Found", 404);
+        }
+
+
+        $targetPost->delete();
+
+        return Response::json([], "Post Deleted Successfully", 200);
 
     }
+
 }

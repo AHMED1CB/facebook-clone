@@ -14,8 +14,10 @@ class AuthController extends Controller
     function getUserDetails()
     {
 
+        $user = request()->user()->load('posts');
+
         return Response::json([
-            'user' => request()->user()
+            'user' => $user
         ], "Success", 200);
 
     }
