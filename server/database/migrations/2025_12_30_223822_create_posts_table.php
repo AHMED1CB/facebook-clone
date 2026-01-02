@@ -15,8 +15,7 @@ return new class extends Migration {
             $table->enum('post_type', ['TXT', 'IMG', 'VID'])->default('TXT');
             $table->enum('post_privacy', ['PUB', 'PRIV', 'FRI'])->default('PUB');
 
-            $table->text('post_content')->nullable();
-            $table->string('media_path')->nullable();
+            $table->text('post_content'); // Will be the Path if the type is not text
 
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
 

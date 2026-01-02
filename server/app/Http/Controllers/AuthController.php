@@ -64,7 +64,7 @@ class AuthController extends Controller
     }
 
 
-    function login()
+    public function login()
     {
 
         $data = request()->only('email', 'password');
@@ -78,9 +78,8 @@ class AuthController extends Controller
         if ($check->fails()) {
 
             return Response::json([
-                'errors' => [
-                    'login' => "Invalid Login Data"
-                ]
+                'errors' => $check->errors(),
+                'dd' => $data
             ], "Invalid Data Data", 400);
         }
 

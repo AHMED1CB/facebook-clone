@@ -35,26 +35,38 @@ class PostController extends Controller
     public function uploadPost()
     {
 
-        $data = ['post_type', 'post_privacy', 'post_content', 'media_file'];
+        $data = ['post_type', 'post_privacy', 'post_content', 'post_content'];
 
         $check = Validator::make(request()->only($data), [
             'post_type' => ['in:TXT,IMG,VID', 'required'],
-
-            'post_content' => ['nullable', 'min:3', 'string', 'max:5000', 'required_if:post_type,TXT'],
-            'media_file' => [
-                'nullable',
-                'file',
-                'required_if:post_type,IMG,VID',
-                'max:40480',
+            'post_content' => [
+                'required',
                 Rule::when(
                     request('post_type') === 'IMG',
-                    ['mimetypes:image/jpeg,image/png,image/webp']
+                    [
+                        'mimetypes:image/jpeg,image/png,image/webp',
+                        'file',
+                        'max:40480'
+                    ]
                 ),
 
                 Rule::when(
                     request('post_type') === 'VID',
-                    ['mimetypes:video/mp4,video/quicktime,video/webm']
+                    [
+                        'mimetypes:video/mp4,video/quicktime,video/webm',
+                        'file',
+                        'max:40480'
+                    ]
+
                 ),
+                Rule::when(
+                    request('post_type') === 'TXT',
+                    [
+                        'string',
+                        'max:5000'
+                    ]
+                )
+
             ],
             'post_privacy' => ['in:PUB,PRIV,FRI'],
         ]);
@@ -74,8 +86,8 @@ class PostController extends Controller
 
         if ($postType !== 'TXT') {
 
-            $mediaPath = request()->file('media_file')->store('posts', 'public');
-            $recordData['media_path'] = $mediaPath;
+            $mediaPath = request()->file('post_content')->store('posts', 'public');
+            $recordData['post_content'] = $mediaPath;
 
         } else {
             $recordData['post_content'] = request()->input('post_content');
