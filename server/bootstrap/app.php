@@ -19,7 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withMiddleware(function ($middleware) {
         $middleware->alias([
-            'auth.facebook' => \App\Http\Middleware\FacebookAuthMiddleware::class,
+            'auth.facebook' => \App\Http\Middleware\FacebookAuthMiddleware::class
+            ,
+            'throttle.json' => \App\Http\Middleware\ThrottleJson::class,
+
         ]);
     })
     ->create();

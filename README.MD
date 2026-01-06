@@ -133,12 +133,12 @@ This project is designed as a **large-scale learning project** focusing on real-
 **Backend**
 
 - Polymorphic likes system
-- Comments & nested replies
+- Comments
 - Optimized counters
 
 **Frontend**
 
-- Like / Unlike button
+- Like Button
 - Comments modal
 
 ---
