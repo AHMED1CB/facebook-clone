@@ -47,6 +47,7 @@ Route::middleware('throttle.json:30,1')->group(function () {
 
     Route::prefix('posts')->middleware('auth.facebook')->controller(PostController::class)->group(function () {
 
+        Route::get('/', 'getSomePosts');
         Route::get('/{postId}', 'getPostDetails');
 
         Route::post('/{postId}/like', 'toggeLike');

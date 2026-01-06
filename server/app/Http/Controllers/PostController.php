@@ -15,7 +15,7 @@ class PostController extends Controller
     public function getPostDetails($postId)
     {
         $userId = request()->user()->id;
-        $targetPost = Post::whereId($postId)->with('comments')->withCount('likes' , 'comments')
+        $targetPost = Post::whereId($postId)->with('comments')->withCount('likes', 'comments')
             ->withExists([
                 'likes as isLiked' => function ($q) use ($userId) {
                     return $q->where('user_id', $userId);
@@ -259,6 +259,25 @@ class PostController extends Controller
         return Response::json([
             'is_liked' => true
         ], 'Post Liked Successfully', 201);
+
+    }
+
+
+    public function getSomePosts()
+    {
+
+        $page = request()->input('page') ?? 1;
+        $userId = request()->user()->id;
+        $posts = Post::with('comments')->withCount('likes', 'comments')->withExists([
+            'likes as isLiked' => function ($q) use ($userId) {
+                 $q->where('user_id', $userId);
+            }
+        ])->paginate(10, ['*'], 'page', $page);
+
+
+        return Response::json([
+            'posts' => $posts->items()
+        ], 'Success', 200);
 
     }
 
