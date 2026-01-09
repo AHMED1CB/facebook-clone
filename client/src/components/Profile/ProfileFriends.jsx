@@ -1,4 +1,12 @@
-import { Box, Paper, Typography, Grid, Avatar, useTheme, Button } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Typography,
+  Grid,
+  Avatar,
+  useTheme,
+  Button,
+} from "@mui/material";
 
 export default function ProfileFriends({ friends }) {
   const theme = useTheme();
@@ -8,12 +16,15 @@ export default function ProfileFriends({ friends }) {
       sx={{
         p: 2,
         borderRadius: 2,
+        width: "100%",
         bgcolor: theme.palette.background.paper,
       }}
     >
       <Box
         sx={{
           display: "flex",
+          width: "100%",
+
           justifyContent: "space-between",
           alignItems: "center",
           mb: 2,
@@ -50,15 +61,14 @@ export default function ProfileFriends({ friends }) {
               >
                 {friend.avatar}
               </Avatar>
-              <Typography
-                variant="body1"
-                sx={{ fontWeight: 500 }}
-              >
+              <Typography variant="body1" sx={{ fontWeight: 500 }}>
                 {friend.name}
               </Typography>
             </Box>
           </Grid>
         ))}
+
+        {friends.length == 0 && "No Friends Yet"}
       </Grid>
     </Paper>
   );

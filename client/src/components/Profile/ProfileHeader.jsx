@@ -42,8 +42,6 @@ export default function ProfileHeader({ user, isOwnProfile = true }) {
     </Avatar>
   );
 
-  console.log(user);
-
   return (
     <Box sx={{ bgcolor: theme.palette.background.default }}>
       {/* Cover Photo */}
@@ -105,20 +103,18 @@ export default function ProfileHeader({ user, isOwnProfile = true }) {
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   {user.friends}
-                  {/* TODO RETURN FRIENDS WITH USER */}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Friends
+                  Friends {user.friends.length}
                 </Typography>
               </Box>
-              {( (
+              {
                 <Box>
                   <Typography variant="body2" color="text.secondary">
                     {user.location ?? "Loaction Not Shared"}
                   </Typography>
                 </Box>
-              )) 
-                }
+              }
             </Box>
 
             {/* Action Buttons */}

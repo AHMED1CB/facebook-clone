@@ -19,21 +19,35 @@ import {
   Public as PublicIcon,
   MoreHoriz as MoreHorizIcon,
 } from "@mui/icons-material";
+import { useSelector } from "react-redux";
 
-export default  ({ post }) => {
+export default ({ post }) => {
   const theme = useTheme();
+  let user = useSelector((s) => s.auth.user);
+  let profileImage = user.photo ? (
+    <Avatar
+      src={`${api.getUri()}/../storage/app/public/${user.photo}`}
+    ></Avatar>
+  ) : (
+    <Avatar>{user.name.slice(0, 2).toUpperCase()}</Avatar>
+  );
+
+  let mediaPath =
+    post.post_type == "IMG" || post.post_type == "VID"
+      ? `${api.getUri()}/../storage/app/public/${post.post_content}`
+      : "";
 
   return (
-    <Card 
+    <Card
       sx={{
         mb: 2,
         borderRadius: 2,
         bgcolor: theme.palette.background.paper,
-        width:'100% !important' 
+        width: "100% !important",
       }}
     >
       <CardHeader
-        avatar={<Avatar>{post.avatar}</Avatar>}
+        avatar={profileImage}
         action={
           <IconButton>
             <MoreHorizIcon />
@@ -41,28 +55,32 @@ export default  ({ post }) => {
         }
         title={
           <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-            {post.author}
+            {user.name}
           </Typography>
         }
         subheader={
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             <Typography variant="caption" color="text.secondary">
-              {post.time}
+              {post.creation_date || "Now"}
             </Typography>
             <Typography variant="caption">•</Typography>
-            <PublicIcon sx={{ fontSize: 12, color: theme.palette.text.secondary }} />
+            <PublicIcon
+              sx={{ fontSize: 12, color: theme.palette.text.secondary }}
+            />
           </Box>
         }
       />
-      <CardContent sx={{ pt: 0 }}>
-        <Typography variant="body1" color="text.primary">
-          {post.content}
-        </Typography>
-      </CardContent>
-      {post.image && (
+      {post.post_type == "TXT" && (
+        <CardContent sx={{ pt: 0 }}>
+          <Typography variant="body1" color="text.primary">
+            {post.post_content}
+          </Typography>
+        </CardContent>
+      )}
+      {post.post_type == "IMG" && (
         <CardMedia
           component="img"
-          image={post.image}
+          image={mediaPath}
           alt="Post image"
           sx={{ maxHeight: 500, objectFit: "cover" }}
         />
@@ -76,7 +94,10 @@ export default  ({ post }) => {
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
+            <Box
+              component="span"
+              sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}
+            >
               <Box
                 component="span"
                 sx={{
@@ -92,11 +113,11 @@ export default  ({ post }) => {
               >
                 👍
               </Box>
-              {post.likes}
+              {post.likes_count}
             </Box>
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {post.comments} Comments • {post.shares} Shares
+            {post.comments_count} Comments
           </Typography>
         </Box>
       </Box>
@@ -106,12 +127,13 @@ export default  ({ post }) => {
           startIcon={<ThumbUpIcon />}
           sx={{
             textTransform: "none",
-            color: theme.palette.text.secondary,
+            color: post.isLiked ? 'primary' : theme.palette.text.secondary,
             flex: 1,
             fontWeight: 600,
+            
           }}
         >
-          Like
+          Like 
         </Button>
         <Button
           startIcon={<CommentIcon />}
@@ -124,17 +146,7 @@ export default  ({ post }) => {
         >
           Comment
         </Button>
-        <Button
-          startIcon={<ShareIcon />}
-          sx={{
-            textTransform: "none",
-            color: theme.palette.text.secondary,
-            flex: 1,
-            fontWeight: 600,
-          }}
-        >
-          Share
-        </Button>
+      
       </CardActions>
     </Card>
   );

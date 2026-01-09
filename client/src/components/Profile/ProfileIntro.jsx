@@ -1,5 +1,4 @@
 import {
-  Box,
   Paper,
   Typography,
   List,
@@ -10,11 +9,8 @@ import {
   useTheme,
 } from "@mui/material";
 import {
-  Home as HomeIcon,
   Work as WorkIcon,
   School as SchoolIcon,
-  Favorite as FavoriteIcon,
-  LocationOn as LocationIcon,
   Schedule as ScheduleIcon,
 } from "@mui/icons-material";
 
@@ -40,7 +36,6 @@ export default ({ user, isOwnProfile = true }) => {
           sx={{ mb: 2, textAlign: "center" }}
         >
           {user.bio || "No Bio"}
-          {/* @TODO ADD BIO */}
         </Typography>
       }
 
