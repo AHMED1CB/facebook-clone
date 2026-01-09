@@ -1,29 +1,17 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   Box,
   Container,
   Paper,
   Typography,
   Switch,
-  Button,
-  Divider,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   useTheme,
 } from "@mui/material";
+import themeChanger from "../../App/Context/ThemeChangerContext";
 
 const Settings = () => {
   const theme = useTheme();
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
-  const [language, setLanguage] = useState("en");
-
-  const handleSave = () => {
-    console.log("Settings saved");
-  };
+  const { mode, setMode } = useContext(themeChanger);
 
   return (
     <Box
@@ -56,8 +44,11 @@ const Settings = () => {
                 </Typography>
               </Box>
               <Switch
-                checked={darkMode}
-                onChange={(e) => setDarkMode(e.target.checked)}
+                checked={mode == 'dark'}
+                onChange={(e) => {
+                  setMode(e.target.checked ? "dark" : "light");
+                  localStorage.mode = e.target.checked ? "dark" : "light";
+                }}
               />
             </Box>
           </Box>

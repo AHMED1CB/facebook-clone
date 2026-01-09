@@ -23,6 +23,7 @@ import {
   Settings,
 } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
+import Cookie from "../../App/Cookie/Cookie";
 
 export default () => {
   const theme = useTheme();
@@ -48,7 +49,10 @@ export default () => {
       icon: <LogoutIcon />,
       text: "Log Out",
       divider: false,
-      event: () => go("/logout"),
+      event: () => {
+        Cookie.remove("authorization");
+        go("auth/register");
+      },
     },
   ];
 
