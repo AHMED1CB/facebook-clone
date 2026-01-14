@@ -268,7 +268,7 @@ class PostController extends Controller
 
         $page = request()->input('page') ?? 1;
         $userId = request()->user()->id;
-        $posts = Post::with(['comments', 'user'])->withCount('likes', 'comments')->withExists([
+        $posts = Post::where('post_privacy', 'PUB')->with(['comments', 'user'])->withCount('likes', 'comments')->withExists([
             'likes as isLiked' => function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             }

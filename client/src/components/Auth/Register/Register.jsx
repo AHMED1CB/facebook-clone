@@ -15,6 +15,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { registerSchema } from "../../../App/Validations/Auth";
 import { register } from "../../../App/services/authServices";
+import Cookie from "../../../App/Cookie/Cookie";
 
 const Register = () => {
   const theme = useTheme();
@@ -29,6 +30,12 @@ const Register = () => {
   const [error, setError] = useState("");
 
   const go = useNavigate();
+
+  useEffect(() => {
+    if (Cookie.get("authorization")) {
+      go("/");
+    }
+  }, []);
 
   const handleRegister = async (e) => {
     e.preventDefault();

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -21,6 +21,13 @@ const Login = () => {
   const theme = useTheme();
   const go = useNavigate();
 
+
+
+  useEffect(() => {
+    if(Cookie.get('authorization')){
+      go('/')
+    }
+  },[])
   const [data, setData] = useState({
     email: "",
     password: "",
