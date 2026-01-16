@@ -14,7 +14,7 @@ const getPosts = createAsyncThunk('getPosts', async (page, { rejectWithValue }) 
             }
         });
 
-        return response;
+        return response.data;
 
     } catch (e) {
         rejectWithValue(e)

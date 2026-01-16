@@ -25,7 +25,7 @@ export const postsSlice = createSlice({
         }).addCase(getPosts.rejected, (s) => {
             s.state = 'Fail'
         }).addCase(getPosts.fulfilled, (s, a) => {
-            s.posts = a.payload?.data?.data?.posts || []
+            s.posts = a.payload?.data?.posts || []
             s.state = 'Success'
         })
 

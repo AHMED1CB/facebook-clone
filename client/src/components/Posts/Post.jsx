@@ -21,7 +21,7 @@ import {
 import { useSelector } from "react-redux";
 import api from "../../App/services/api";
 
-export default ({ post  , ref , onLike}) => {
+export default ({ post, ref, onLike }) => {
   const theme = useTheme();
 
   const authUser = useSelector((s) => s.auth.user);
@@ -45,7 +45,7 @@ export default ({ post  , ref , onLike}) => {
         bgcolor: theme.palette.background.paper,
         width: "100% !important",
       }}
-      // ref={ref}
+      ref={ref ?? null}
     >
       <CardHeader
         avatar={profileImage}

@@ -92,7 +92,9 @@ const Home = () => {
 
   return (
     posts && (
-      <PostContext.Provider value={{ posts: posts, setPosts }}>
+      <PostContext.Provider
+        value={{ posts: combinedPosts, setPosts: setCombinedPosts }}
+      >
         <Box
           sx={{
             height: "fit-content",

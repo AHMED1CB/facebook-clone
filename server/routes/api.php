@@ -9,7 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RequestsController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('throttle.json:30,1')->group(function () {
+Route::middleware('throttle.json:80,1')->group(function () {
 
     Route::prefix('auth')->group(function () {
 
