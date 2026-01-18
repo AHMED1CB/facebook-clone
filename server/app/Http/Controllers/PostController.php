@@ -51,7 +51,7 @@ class PostController extends Controller
                     [
                         'mimetypes:image/jpeg,image/png,image/webp',
                         'file',
-                        'max:40480'
+                        'max:40960'
                     ]
                 ),
 
@@ -60,7 +60,7 @@ class PostController extends Controller
                     [
                         'mimetypes:video/mp4,video/quicktime,video/webm',
                         'file',
-                        'max:40480'
+                        'max:40960'
                     ]
 
                 ),

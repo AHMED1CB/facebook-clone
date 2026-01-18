@@ -13,6 +13,7 @@ import {
   ListItemText,
   useTheme,
   alpha,
+  CircularProgress,
 } from "@mui/material";
 import {
   Close,
@@ -21,6 +22,7 @@ import {
   GroupOutlined,
   LockOutlined,
   CheckCircle,
+  Videocam,
 } from "@mui/icons-material";
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -28,7 +30,7 @@ import api from "../../App/services/api";
 import Alert from "../../App/Alert/Swal";
 import { upload } from "../../App/services/postservices";
 
-export default ({ open, onClose , onUpload }) => {
+export default ({ open, onClose, onUpload }) => {
   const theme = useTheme();
 
   let defaultData = {
@@ -42,6 +44,10 @@ export default ({ open, onClose , onUpload }) => {
   const [privacyAnchorEl, setPrivacyAnchorEl] = useState(null);
   const [selectedPrivacy, setSelectedPrivacy] = useState("public");
   const [loading, setLoading] = useState(false);
+  const [isVideoUploading, setIsVideoUploading] = useState(false);
+
+  const [hasVideo, setHasVideo] = useState(false);
+
   const handlePrivacyClick = (event) => {
     setPrivacyAnchorEl(event.currentTarget);
   };
@@ -190,12 +196,18 @@ export default ({ open, onClose , onUpload }) => {
       margin: theme.spacing(0, 2, 2),
       position: "relative",
       backgroundColor: theme.palette.background.paper,
+      overflow: "hidden",
     },
     mediaPreview: {
       width: "100%",
       maxHeight: "300px",
       objectFit: "cover",
       backgroundColor: theme.palette.grey[100],
+    },
+    videoPreview: {
+      width: "100%",
+      maxHeight: "300px",
+      backgroundColor: "#000",
     },
     removeButton: {
       position: "absolute",
@@ -269,6 +281,19 @@ export default ({ open, onClose , onUpload }) => {
     },
     iconColor: {
       photo: theme.palette.success.main,
+      video: theme.palette.error.main,
+    },
+    uploadOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: alpha(theme.palette.common.black, 0.5),
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1,
     },
   };
 
@@ -281,50 +306,136 @@ export default ({ open, onClose , onUpload }) => {
   );
 
   const imgInputRef = useRef(null);
-  const videoInputRed = useRef(null);
+  const videoInputRef = useRef(null);
 
   const handleImageChanged = (e) => {
-
     let file = e.target.files[0];
-    if (!file || !file.type.startsWith("image/")) {
-      Alert.error("Invalid Image File", "The Chosen File is Not an Image File");
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      Alert.error("Invalid Image File", "The chosen file is not an image");
       return;
     }
-    setPost({ ...post, post_type: "IMG", post_content: file });
+
+    setHasVideo(false);
+
+    setPost({
+      ...post,
+      post_type: "IMG",
+      post_content: file,
+      subtext: post.subtext || "",
+    });
 
     const reader = new FileReader();
-
     reader.onload = (r) => {
       setMediaPath(r.target.result);
     };
-
     reader.readAsDataURL(file);
   };
 
+  const handleVideoChanged = (e) => {
+    let file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("video/")) {
+      Alert.error("Invalid Video File", "The chosen file is not a video");
+      return;
+    }
+
+    const maxSize = 40 * 1024 * 1024;
+    if (file.size > maxSize) {
+      Alert.error("File Too Large", "Video must be less than 40MB");
+      return;
+    }
+
+    setHasVideo(true);
+
+    setPost({
+      ...post,
+      post_type: "VID",
+      post_content: file,
+
+      subtext: post.subtext || "",
+    });
+
+    const reader = new FileReader();
+    reader.onload = (r) => {
+      setMediaPath(r.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearMedia = () => {
+    setPost({
+      ...post,
+      post_type: "TXT",
+      post_content: "",
+
+      subtext: post.post_type === "TXT" ? post.subtext : "",
+    });
+    setMediaPath(null);
+    setHasVideo(false);
+
+    if (imgInputRef.current) imgInputRef.current.value = "";
+    if (videoInputRef.current) videoInputRef.current.value = "";
+  };
+
   const uploadPost = async () => {
-    if (loading) {
-      return;
-    }
-    setLoading(() => true);
-    let form = new FormData();
+    if (loading) return;
 
-    form.append("post_privacy", post.post_privacy);
-    form.append("post_content", post.post_content);
-    form.append("post_type", post.post_type);
-    if (post.subtext) {
-      form.append("subtext", post.subtext);
-    }
-
-    if (post.post_type == "TXT" && post.post_content?.trim().length < 1) {
-      Alert.error("Invalid Details", "Post Content Cannot Be Empty");
+    if (
+      post.post_type === "TXT" &&
+      (!post.post_content || post.post_content.trim().length < 1)
+    ) {
+      Alert.error("Invalid Details", "Post content cannot be empty");
       return;
     }
 
-    let uploaded = await upload(form);
-    uploaded = uploaded?.data?.data?.post;
-    onUpload(uploaded);
-    onClose();
-    setLoading(() => false);
+    if (
+      (post.post_type === "IMG" || post.post_type === "VID") &&
+      !post.post_content
+    ) {
+      Alert.error("Invalid Details", "Please select a file to upload");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      let form = new FormData();
+
+      form.append("post_privacy", post.post_privacy);
+      form.append("post_type", post.post_type);
+
+      if (post.post_type === "TXT") {
+        form.append("post_content", post.post_content);
+      } else {
+        form.append("post_content", post.post_content);
+      }
+
+      if (post.subtext && post.subtext.trim().length > 0) {
+        form.append("subtext", post.subtext);
+      }
+
+      setIsVideoUploading(post.post_type === "VID");
+      let uploaded = await upload(form);
+      if (uploaded?.data?.data?.post) {
+        onUpload(uploaded.data.data.post);
+        onClose();
+        setPost(defaultData);
+        setMediaPath(null);
+        setHasVideo(false);
+        setSelectedPrivacy("public");
+      } else {
+        Alert.error("Upload Failed", "Failed to create post");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      Alert.error("Upload Failed", error.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+      setIsVideoUploading(false);
+    }
   };
 
   return (
@@ -357,7 +468,6 @@ export default ({ open, onClose , onUpload }) => {
           PaperProps={{
             sx: {
               width: 320,
-              borderRadius: theme.shape.borderRadius / 2,
               boxShadow: theme.shadows[8],
               marginTop: theme.spacing(1),
             },
@@ -375,7 +485,7 @@ export default ({ open, onClose , onUpload }) => {
                 marginBottom: theme.spacing(0.5),
               }}
             >
-              Who can see your video?
+              Who can see your {hasVideo ? "video" : "post"}?
             </Typography>
             <Typography
               sx={{
@@ -435,39 +545,67 @@ export default ({ open, onClose , onUpload }) => {
 
         <Box sx={styles.textAreaContainer}>
           <textarea
-            placeholder="What's on your mind"
+            placeholder={
+              hasVideo
+                ? "Add a caption for your video..."
+                : "What's on your mind..."
+            }
             style={styles.textArea}
+            value={post.subtext || ""}
             onChange={(e) =>
               setPost({
                 ...post,
+                subtext: e.target.value,
+
                 post_content:
                   post.post_type === "TXT"
                     ? e.target.value.trim()
                     : post.post_content,
-                subtext: e.target.value.trim(),
               })
             }
           />
         </Box>
-        {post.post_type === "IMG" && (
-          <Box sx={styles.mediaPreviewContainer}>
-            <Box
-              component="img"
-              src={mediaPath}
-              alt="Preview"
-              sx={styles.mediaPreview}
-            />
-            <IconButton size="small" sx={styles.removeButton}>
-              <Close
-                fontSize="small"
-                onClick={() => {
-                  setPost({ ...post, post_content: "", post_type: "TXT" });
-                  setMediaPath(null);
-                }}
-              />
-            </IconButton>
-          </Box>
-        )}
+
+        {(post.post_type === "IMG" || post.post_type === "VID") &&
+          mediaPath && (
+            <Box sx={styles.mediaPreviewContainer}>
+              {isVideoUploading && (
+                <Box sx={styles.uploadOverlay}>
+                  <CircularProgress color="primary" />
+                  <Typography sx={{ color: "white", ml: 2 }}>
+                    Uploading video...
+                  </Typography>
+                </Box>
+              )}
+
+              {post.post_type === "IMG" ? (
+                <Box
+                  component="img"
+                  src={mediaPath}
+                  alt="Preview"
+                  sx={styles.mediaPreview}
+                />
+              ) : (
+                <Box
+                  component="video"
+                  src={mediaPath}
+                  controls
+                  sx={styles.videoPreview}
+                >
+                  Your browser does not support the video tag.
+                </Box>
+              )}
+
+              <IconButton
+                size="small"
+                sx={styles.removeButton}
+                onClick={clearMedia}
+                disabled={isVideoUploading}
+              >
+                <Close fontSize="small" />
+              </IconButton>
+            </Box>
+          )}
 
         <Box sx={styles.actionButtons}>
           <Typography sx={styles.actionTitle}>Add to your post</Typography>
@@ -475,18 +613,38 @@ export default ({ open, onClose , onUpload }) => {
             <IconButton
               sx={styles.actionIconButton}
               onClick={() => imgInputRef.current.click()}
+              disabled={hasVideo || isVideoUploading}
+              title="Add photo"
             >
               <PhotoCamera sx={{ color: styles.iconColor.photo }} />
+            </IconButton>
+
+            <IconButton
+              sx={styles.actionIconButton}
+              onClick={() => videoInputRef.current.click()}
+              disabled={post.post_type === "IMG" || isVideoUploading}
+              title="Add video"
+            >
+              <Videocam sx={{ color: styles.iconColor.video }} />
             </IconButton>
           </Box>
         </Box>
 
+        {/* Hidden file inputs */}
         <input
           type="file"
           hidden
           accept="image/*"
           ref={imgInputRef}
           onChange={handleImageChanged}
+        />
+
+        <input
+          type="file"
+          hidden
+          accept="video/*"
+          ref={videoInputRef}
+          onChange={handleVideoChanged}
         />
 
         <Box sx={styles.modalFooter}>
@@ -501,9 +659,9 @@ export default ({ open, onClose , onUpload }) => {
             disableElevation
             sx={styles.postButton}
             onClick={uploadPost}
-            disabled={loading}
+            disabled={loading || isVideoUploading}
           >
-            Post
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Post"}
           </Button>
         </Box>
       </Paper>

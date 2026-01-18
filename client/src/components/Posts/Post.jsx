@@ -31,6 +31,7 @@ import {
 import { useSelector } from "react-redux";
 import api from "../../App/services/api";
 import Alert from "../../App/Alert/Swal";
+import VideoPlayer from "./VideoPlayer";
 
 export default ({ post, ref, onLike, onDelete }) => {
   const theme = useTheme();
@@ -212,6 +213,10 @@ export default ({ post, ref, onLike, onDelete }) => {
           alt="Post image"
           sx={{ maxHeight: 500, objectFit: "cover" }}
         />
+      )}
+
+      {post.post_type == "VID" && (
+        <VideoPlayer src={mediaPath}/>
       )}
       <Box sx={{ px: 2, py: 1 }}>
         <Box
