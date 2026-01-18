@@ -22,7 +22,7 @@ export default () => {
 
   let profileImage = user.photo ? (
     <Avatar
-      src={`${api.getUri()}/..//public/${user.photo}`}
+      src={`${api.getUri()}/../storage/${user.photo}`}
     ></Avatar>
   ) : (
     <Avatar>{user.name[0]}</Avatar>

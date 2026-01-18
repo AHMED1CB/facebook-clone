@@ -1,21 +1,34 @@
-import {
-  Paper,
-  Box,
-  Avatar,
-  Typography,
-  Divider,
-  Button,
-  useTheme,
-} from "@mui/material";
-import {
-  OndemandVideo as VideoIcon,
-  PhotoLibrary as PhotoIcon,
-  EmojiEmotions as EmojiIcon,
-} from "@mui/icons-material";
-
-export default  () => {
+import { Paper, Box, Avatar, Typography, useTheme } from "@mui/material";
+import { useSelector } from "react-redux";
+import api from "../../App/services/api";
+export default ({ setOpen }) => {
   const theme = useTheme();
+  const user = useSelector((s) => s.auth.user);
 
+  let profileImage = user.photo ? (
+    <Avatar
+      sx={{
+        border: `4px solid ${theme.palette.background.default}`,
+        bgcolor: theme.palette.primary.main,
+        color: "white",
+        fontSize: 48,
+        fontWeight: 700,
+      }}
+      src={`${api.getUri()}/../storage/${user.photo}`}
+    ></Avatar>
+  ) : (
+    <Avatar
+      sx={{
+        border: `4px solid ${theme.palette.background.default}`,
+        bgcolor: theme.palette.primary.main,
+        color: "white",
+        fontSize: 48,
+        fontWeight: 700,
+      }}
+    >
+      {user.name.slice(0, 2).toUpperCase()}
+    </Avatar>
+  );
   return (
     <Paper
       sx={{
@@ -25,10 +38,12 @@ export default  () => {
         bgcolor: theme.palette.background.paper,
       }}
     >
-      <Box sx={{ display: "flex", gap: 1.5, mb: 2 }}>
-        <Avatar>U</Avatar>
+      <Box sx={{ display: "flex", gap: 1.5 }}>
+        {profileImage}
         <Box
-          onClick={() => {}}
+          onClick={() => {
+            setOpen((o) => !o);
+          }}
           sx={{
             flex: 1,
             bgcolor: theme.palette.mode === "light" ? "#F0F2F5" : "#3A3B3C",
@@ -43,40 +58,6 @@ export default  () => {
         >
           <Typography color="text.secondary">What's on your mind?</Typography>
         </Box>
-      </Box>
-      <Divider sx={{ mb: 1 }} />
-      <Box sx={{ display: "flex", justifyContent: "space-around" }}>
-        <Button
-          startIcon={<VideoIcon sx={{ color: theme.palette.error.main }} />}
-          sx={{
-            textTransform: "none",
-            color: theme.palette.text.secondary,
-            fontWeight: 600,
-          }}
-        >
-          Live video
-        </Button>
-        <Button
-          startIcon={<PhotoIcon sx={{ color: theme.palette.success.main }} />}
-          sx={{
-            textTransform: "none",
-            color: theme.palette.text.secondary,
-            fontWeight: 600,
-          }}
-        >
-          Photo/video
-        </Button>
-        <Button
-          startIcon={<EmojiIcon sx={{ color: theme.palette.warning.main }} />}
-          sx={{
-            textTransform: "none",
-            color: theme.palette.text.secondary,
-            fontWeight: 600,
-            display: { xs: "none", sm: "flex" },
-          }}
-        >
-          Feeling/activity
-        </Button>
       </Box>
     </Paper>
   );

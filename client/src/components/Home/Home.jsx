@@ -8,6 +8,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { getPosts } from "../../App/Redux/Features/Posts/Services";
 import Loader from "../Loader/Loader";
 import PostContext from "../../App/Context/PostsContext";
+import CreatePostModal from "../Posts/CreatePostModal";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -45,7 +46,7 @@ const Home = () => {
         setCombinedPosts((prev) => {
           const newPosts = posts.filter(
             (newPost) =>
-              !prev.some((existingPost) => existingPost.id === newPost.id)
+              !prev.some((existingPost) => existingPost.id === newPost.id),
           );
           return [...prev, ...newPosts];
         });
@@ -80,15 +81,17 @@ const Home = () => {
         {
           threshold: 0.5,
           rootMargin: "100px",
-        }
+        },
       );
 
       if (node) {
         observerRef.current.observe(node);
       }
     },
-    [state, isLoadingMore, hasMore, page, dispatch]
+    [state, isLoadingMore, hasMore, page, dispatch],
   );
+
+  const [open, setOpen] = useState(false);
 
   return (
     posts && (
@@ -123,7 +126,7 @@ const Home = () => {
                 }}
               >
                 <Box sx={{ mb: 2 }}>
-                  <CreatePost />
+                  <CreatePost  setOpen={setOpen} />
                 </Box>
 
                 <Box>
@@ -156,6 +159,8 @@ const Home = () => {
                 <Contacts contacts={friends} />
               </Grid>
             </Grid>
+
+            <CreatePostModal open={open} onClose={() => setOpen(!open)} />
           </Container>
         </Box>
       </PostContext.Provider>

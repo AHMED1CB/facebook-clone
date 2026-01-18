@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -26,7 +26,7 @@ const Register = () => {
     name: "",
     password_confirmation: "",
   });
-
+  
   const [error, setError] = useState("");
 
   const go = useNavigate();
