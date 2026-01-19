@@ -16,7 +16,6 @@ export default ({ lastElementRef, openCommentsPlace }) => {
 
   const onCommentsOpen = (idx) => {
     openCommentsPlace(posts[idx]);
-    console.log(posts[idx])
   };
   const likePost = async (idx) => {
     if (loading) {

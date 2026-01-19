@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Modal,
   Box,
@@ -23,6 +23,8 @@ import {
 } from "@mui/icons-material";
 import api from "../../App/services/api";
 import { useSelector } from "react-redux";
+import PostContext from "../../App/Context/PostsContext";
+import { comment } from "../../App/services/postservices";
 
 export default function CommentsModal({
   open = true,
@@ -31,44 +33,41 @@ export default function CommentsModal({
 }) {
   const [comments, setComments] = useState(post?.comments);
   const [text, setText] = useState("");
-  const [loading] = useState(false);
-
-  const addComment = () => {
+  const [loading, setLoading] = useState(false);
+  const authUser = useSelector((s) => s.auth.user);
+  const { setPosts } = useContext(PostContext);
+  const addComment = async () => {
     if (!text.trim()) return;
-    setComments([
-      {
-        id: Date.now(),
-        user: {
-          name: "Current User",
-          avatar: "https://i.pravatar.cc/150?img=4",
-        },
-        text,
-        time: "Now",
-        likes: 0,
-        liked: false,
-      },
-      ...comments,
-    ]);
-    setText("");
-  };
+    let id = post.id;
 
+    let commentData = {
+      content: text.trim(),
+    };
 
-  const toggleLike = (id) =>
-    setComments(
-      comments.map((c) =>
-        c.id === id
-          ? { ...c, liked: !c.liked, likes: c.likes + (c.liked ? -1 : 1) }
-          : c,
+    setLoading(() => true);
+    const uploadedComment = await comment(id, commentData);
+    setPosts((posts) =>
+      posts.map((p) =>
+        p.id === post.id
+          ? {
+              ...p,
+              comments: [...p.comments, uploadedComment.data.data.comment],
+            }
+          : p,
       ),
     );
+
+    setComments([...comments, uploadedComment.data.data.comment]);
+
+    setText("");
+    setLoading(() => false);
+  };
 
   useEffect(() => {
     if (post) {
       setComments(post.comments);
     }
   }, [post]);
-
-  const authUser = useSelector((s) => s.auth.user)
 
   return (
     comments && (
@@ -112,35 +111,20 @@ export default function CommentsModal({
               </Box>
             ) : comments.length ? (
               <List disablePadding>
-                {comments.map((c, i) => (
-                  <React.Fragment key={c.id}>
-                    <ListItem alignItems="flex-start">
-                      <ListItemAvatar>
-                        <Avatar src={`${api.getUri()}/../storage/${c.user.photo}`} />
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
-                          >
-                            <Typography fontWeight={700}>
-                              {c.user.name}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {c.time}
-                            </Typography>
-                          </Box>
-                        }
-                        secondary={
-                          <>
-                            <Typography sx={{ my: 1 }}>{c.content}</Typography>
+                {comments.map((c, i) => {
+                  if (!c.user) {
+                    c.user = authUser;
+                  }
+                  return (
+                    <React.Fragment key={c.id}>
+                      <ListItem alignItems="flex-start">
+                        <ListItemAvatar>
+                          <Avatar
+                            src={`${api.getUri()}/../storage/${c.user.photo}`}
+                          />
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={
                             <Box
                               sx={{
                                 display: "flex",
@@ -148,14 +132,37 @@ export default function CommentsModal({
                                 gap: 1,
                               }}
                             >
+                              <Typography fontWeight={700}>
+                                {c.user.name}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {c.time}
+                              </Typography>
                             </Box>
-                          </>
-                        }
-                      />
-                    </ListItem>
-                    {i < comments.length - 1 && <Divider />}
-                  </React.Fragment>
-                ))}
+                          }
+                          secondary={
+                            <>
+                              <Typography sx={{ my: 1 }}>
+                                {c.content}
+                              </Typography>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1,
+                                }}
+                              ></Box>
+                            </>
+                          }
+                        />
+                      </ListItem>
+                      {i < comments.length - 1 && <Divider />}
+                    </React.Fragment>
+                  );
+                })}
               </List>
             ) : (
               <Typography align="center" color="text.secondary">

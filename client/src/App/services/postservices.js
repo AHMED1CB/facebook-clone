@@ -82,5 +82,32 @@ const upload = async (data) => {
 
 
 
+const comment = async (post , commentData) => {
 
-export { like, DeletePost, upload }
+    try {
+        const response = await api.post(`/comments/${post}`, commentData, {
+            headers: {
+                Authorization: Cookie.get('authorization'),
+            }
+        });
+
+        return {
+            data: response.data,
+            message: "Success",
+            code: response.status
+        }
+    } catch (error) {
+        return {
+            data: {},
+            message: 'Fail',
+            code: error?.status ?? 500,
+            error: error
+
+        }
+    }
+}
+
+
+
+
+export { like, DeletePost, upload , comment }
