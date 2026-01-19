@@ -33,7 +33,7 @@ import api from "../../App/services/api";
 import Alert from "../../App/Alert/Swal";
 import VideoPlayer from "./VideoPlayer";
 
-export default ({ post, ref, onLike, onDelete }) => {
+export default ({ post, ref, onLike, onDelete , onCommentsOpen }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -278,6 +278,7 @@ export default ({ post, ref, onLike, onDelete }) => {
             flex: 1,
             fontWeight: 600,
           }}
+          onClick={onCommentsOpen}
         >
           Comment
         </Button>

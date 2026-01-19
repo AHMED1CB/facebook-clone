@@ -5,7 +5,7 @@ import PostContext from "../../App/Context/PostsContext";
 import { DeletePost, like } from "../../App/services/postservices";
 import Alert from "../../App/Alert/Swal";
 
-export default ({ lastElementRef }) => {
+export default ({ lastElementRef, openCommentsPlace }) => {
   const { posts, setPosts } = useContext(PostContext);
   const theme = useTheme();
   const [loading, setLoading] = useState(false);
@@ -14,6 +14,10 @@ export default ({ lastElementRef }) => {
     Alert.init(theme);
   }, []);
 
+  const onCommentsOpen = (idx) => {
+    openCommentsPlace(posts[idx]);
+    console.log(posts[idx])
+  };
   const likePost = async (idx) => {
     if (loading) {
       return;
@@ -31,8 +35,8 @@ export default ({ lastElementRef }) => {
                 : post.likes_count + 1,
               isLiked: !post.isLiked,
             }
-          : post
-      )
+          : post,
+      ),
     );
 
     await like(posts[idx].id);
@@ -64,6 +68,7 @@ export default ({ lastElementRef }) => {
             ref={isLast ? lastElementRef : null}
             onLike={() => likePost(i)}
             onDelete={() => deletePost(i)}
+            onCommentsOpen={() => onCommentsOpen(i)}
           />
         );
       })}

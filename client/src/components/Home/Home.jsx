@@ -9,6 +9,7 @@ import { getPosts } from "../../App/Redux/Features/Posts/Services";
 import Loader from "../Loader/Loader";
 import PostContext from "../../App/Context/PostsContext";
 import CreatePostModal from "../Posts/CreatePostModal";
+import CommentsModal from "../Comments/Modal";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -25,7 +26,9 @@ const Home = () => {
   const { state } = useSelector((s) => s.posts);
   const p = useSelector((s) => s.posts.posts);
   const [posts, setPosts] = useState([]);
-
+  const [activePost, setActivePost] = useState(null);
+  const [showComments , setShowComments] = useState(false)
+  
   useEffect(() => {
     if (p && p.length > 0) {
       setPosts(p);
@@ -104,6 +107,13 @@ const Home = () => {
       return [newPost, ...prev];
     });
   };
+
+  const openCommentsPlace = (post) => {
+    setActivePost(() => post)
+    setShowComments(() => true)
+  }
+
+  
   return (
     posts && (
       <PostContext.Provider
@@ -209,7 +219,7 @@ const Home = () => {
                 </Box>
 
                 <Box>
-                  <Posts lastElementRef={lastPostElementRef} />
+                  <Posts lastElementRef={lastPostElementRef} openCommentsPlace={openCommentsPlace} />
 
                   {(state === "Loading" || isLoadingMore) && <Loader />}
 
@@ -269,6 +279,8 @@ const Home = () => {
               onClose={() => setOpen(!open)}
               onUpload={onUpload}
             />
+
+            <CommentsModal open={showComments} onClose={() => setShowComments(false)} post={activePost} />
           </Container>
         </Box>
       </PostContext.Provider>
