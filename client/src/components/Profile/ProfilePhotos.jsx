@@ -1,11 +1,13 @@
 import { Box, Paper, Typography, Grid, useTheme, Button } from "@mui/material";
 import { useSelector } from "react-redux";
+import api from "../../App/services/api";
 
 export default () => {
   const theme = useTheme();
 
   const user = useSelector((s) => s.auth.user);
-  let photos = user.posts.filter((p) => p.type === "IMG");
+
+  let photos = user.posts.filter((p) => p.post_type === "IMG").slice(0 , 20);
 
   return (
     <Paper
@@ -38,11 +40,11 @@ export default () => {
       </Box>
 
       <Grid container spacing={1}>
-        {photos.slice(0, 9).map((photo, index) => (
+        {photos.slice(0, 9).map(({post_content: photo}, index) => (
           <Grid item xs={4} key={index}>
             <Box
               component="img"
-              src={photo}
+              src={`${api.getUri()}/../storage/${photo}`}
               alt={`Photo ${index + 1}`}
               sx={{
                 width: "100%",
