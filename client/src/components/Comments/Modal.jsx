@@ -6,25 +6,20 @@ import {
   Avatar,
   Typography,
   TextField,
-  Button,
   Divider,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
   CircularProgress,
+  Menu,
+  MenuItem,
 } from "@mui/material";
-import {
-  Close,
-  Favorite,
-  FavoriteBorder,
-  Send,
-  MoreVert,
-} from "@mui/icons-material";
+import { Close, Send, MoreVert, Delete } from "@mui/icons-material";
 import api from "../../App/services/api";
 import { useSelector } from "react-redux";
 import PostContext from "../../App/Context/PostsContext";
-import { comment } from "../../App/services/postservices";
+import { comment, deleteCommentById } from "../../App/services/postservices";
 
 export default function CommentsModal({
   open = true,
@@ -34,8 +29,12 @@ export default function CommentsModal({
   const [comments, setComments] = useState(post?.comments);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedComment, setSelectedComment] = useState(null);
   const authUser = useSelector((s) => s.auth.user);
   const { setPosts } = useContext(PostContext);
+
   const addComment = async () => {
     if (!text.trim()) return;
     let id = post.id;
@@ -45,6 +44,7 @@ export default function CommentsModal({
     };
 
     setLoading(() => true);
+
     const uploadedComment = await comment(id, commentData);
     setPosts((posts) =>
       posts.map((p) =>
@@ -58,9 +58,48 @@ export default function CommentsModal({
     );
 
     setComments([...comments, uploadedComment.data.data.comment]);
-
     setText("");
     setLoading(() => false);
+  };
+
+  const handleMenuOpen = (event, comment) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedComment(comment);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedComment(null);
+  };
+
+  const deleteComment = async () => {
+    if (!selectedComment) return;
+
+    setDeleting(true);
+    try {
+      await deleteCommentById(selectedComment.id);
+
+      const updatedComments = comments.filter(
+        (c) => c.id !== selectedComment.id,
+      );
+      setComments(updatedComments);
+
+      setPosts((posts) =>
+        posts.map((p) =>
+          p.id === post.id ? { ...p, comments: updatedComments } : p,
+        ),
+      );
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    } finally {
+      setDeleting(false);
+      handleMenuClose();
+    }
+  };
+
+  const canDeleteComment = (comment) => {
+    // Allow delete if user is the comment author or the post owner
+    return authUser.id === comment?.user?.id || !comment.user;
   };
 
   useEffect(() => {
@@ -155,6 +194,16 @@ export default function CommentsModal({
                             </>
                           }
                         />
+                        {canDeleteComment(c) && (
+                          <IconButton
+                            size="small"
+                            onClick={(e) => handleMenuOpen(e, c)}
+                            disabled={deleting}
+                            sx={{ ml: 1 }}
+                          >
+                            <MoreVert fontSize="small" />
+                          </IconButton>
+                        )}
                       </ListItem>
                       {i < comments.length - 1 && <Divider />}
                     </React.Fragment>
@@ -167,6 +216,22 @@ export default function CommentsModal({
               </Typography>
             )}
           </Box>
+
+          {/* Delete Menu */}
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem onClick={deleteComment} disabled={deleting}>
+              {deleting ? (
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+              ) : (
+                <Delete fontSize="small" sx={{ mr: 1 }} />
+              )}
+              Delete Comment
+            </MenuItem>
+          </Menu>
 
           {/* Input */}
           <Box
