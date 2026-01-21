@@ -26,7 +26,7 @@ export default function CommentsModal({
   onClose = () => {},
   post,
 }) {
-  const [comments, setComments] = useState(post?.comments);
+  const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -34,6 +34,12 @@ export default function CommentsModal({
   const [selectedComment, setSelectedComment] = useState(null);
   const authUser = useSelector((s) => s.auth.user);
   const { setPosts } = useContext(PostContext);
+
+  useEffect(() => {
+    if (post) {
+      setComments(post.comments);
+    }
+  }, [post]);
 
   const addComment = async () => {
     if (!text.trim()) return;
@@ -168,32 +174,26 @@ export default function CommentsModal({
                                 gap: 1,
                               }}
                             >
-                              <Typography fontWeight={700}>
-                                {c?.user?.name || authUser.name}
+                              <Typography component="span" fontWeight={700}>
+                                {c?.user?.name || authUser?.name}
                               </Typography>
                               <Typography
                                 variant="caption"
                                 color="text.secondary"
+                                component="span"
                               >
                                 {c.time}
                               </Typography>
                             </Box>
                           }
                           secondary={
-                            <>
-                              <Typography sx={{ my: 1 }}>
-                                {c.content}
-                              </Typography>
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 1,
-                                }}
-                              ></Box>
-                            </>
+                            <Typography component="span" sx={{ my: 1 }}>
+                              {c.content}
+                            </Typography>
                           }
+                          secondaryTypographyProps={{ component: "span" }}
                         />
+
                         {canDeleteComment(c) && (
                           <IconButton
                             size="small"
