@@ -50,6 +50,7 @@ Route::middleware('throttle.json:80,1')->group(function () {
     Route::prefix('posts')->middleware('auth.facebook')->controller(PostController::class)->group(function () {
 
         Route::get('/', 'getSomePosts');
+        Route::get('/videos', 'getSomeVideos');
         Route::get('/{postId}', 'getPostDetails');
 
         Route::post('/{postId}/like', 'toggeLike');
@@ -62,7 +63,7 @@ Route::middleware('throttle.json:80,1')->group(function () {
 
     });
 
-
+    
     Route::prefix('comments')->middleware('auth.facebook')->controller(CommentsController::class)->group(function () {
 
         Route::post('/{postId}', 'commentOnPost');

@@ -35,6 +35,22 @@ class PostController extends Controller
     }
 
 
+    public function getSomeVideos()
+    {
+        $page = request()->input('page') ?? 1;
+        $userId = request()->user()->id;
+        $posts = Post::where('post_privacy', 'PUB')->where('post_type', 'VID')->with(['comments.user', 'user'])->withCount('likes', 'comments')->withExists([
+            'likes as isLiked' => function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            }
+        ])->orderBy('id', 'Desc')->paginate(10, ['*'], 'page', $page);
+
+
+        return Response::json([
+            'videos' => $posts->items()
+        ], 'Success', 200);
+
+    }
 
     public function uploadPost()
     {
