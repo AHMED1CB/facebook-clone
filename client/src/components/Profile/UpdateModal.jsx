@@ -65,11 +65,11 @@ const UpdateModal = ({ open, onClose, userData }) => {
       });
 
       setDisplayedImage(
-        userData.photo ? `${api.getUri()}/../storage/${userData.photo}` : null
+        userData.photo ? `${api.getUri()}/../storage/${userData.photo}` : null,
       );
 
       setCoverPreview(
-        userData.cover ? `${api.getUri()}/../storage/${userData.cover}` : null
+        userData.cover ? `${api.getUri()}/../storage/${userData.cover}` : null,
       );
     }
   }, [userData, open]);
@@ -80,7 +80,10 @@ const UpdateModal = ({ open, onClose, userData }) => {
 
   const handleProfileImageChanged = (e) => {
     const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith("image/")) return;
+    if (!file || !file.type.startsWith("image/")) {
+      Alert.error("Invalid Photo Image", "The Selected Photo File is invalid");
+      return;
+    }
 
     setData((prev) => ({ ...prev, photo: file }));
 
@@ -91,7 +94,10 @@ const UpdateModal = ({ open, onClose, userData }) => {
 
   const handleCoverChanged = (e) => {
     const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith("image/")) return;
+    if (!file || !file.type.startsWith("image/")) {
+      Alert.error("Invalid Cover Image", "The Selected Cover File is invalid");
+      return;
+    }
 
     setData((prev) => ({ ...prev, cover: file }));
 
@@ -117,6 +123,13 @@ const UpdateModal = ({ open, onClose, userData }) => {
 
     setIsLoading(true);
     let newData = await update(formData);
+
+    if (newData?.error?.data?.data?.errors) {
+      let key = Object.keys(newData.error.data.data.errors)[0];
+      Alert.error("Invalid Data", newData?.error?.data?.data?.errors[key][0]);
+      setIsLoading(false);
+      return;
+    }
     let newUser = newData?.data?.user;
 
     setIsLoading(false);

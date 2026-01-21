@@ -24,8 +24,8 @@ class ProfileController extends Controller
             'name' => ['nullable', 'string', 'max:255', 'min:3'],
             'location' => ['nullable', 'string', 'max:255', 'min:3'],
             'state' => ['nullable', 'string', 'max:255', 'min:3'],
-            'photo' => ['max:20480', 'image', 'mimes:jpg,png,jpeg,gif,svg'],
-            'cover' => ['max:20480', 'image', 'mimes:jpg,png,jpeg,gif,svg'],
+            'photo' => ['max:20480', 'image', 'mimes:jpg,png,jpeg,gif,svg,webp'],
+            'cover' => ['max:20480', 'image', 'mimes:jpg,png,jpeg,gif,svg,webp'],
             'bio' => ['max:255', 'min:3'],
         ]);
 
@@ -34,7 +34,7 @@ class ProfileController extends Controller
 
             return Response::json([
                 'errors' => $check->errors()
-            ], "Invalid Profile Data", );
+            ], "Invalid Profile Data", 400 );
 
         }
 
