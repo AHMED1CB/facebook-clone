@@ -95,8 +95,6 @@ export default function CommentsModal({
           p.id === post.id ? { ...p, comments: updatedComments } : p,
         ),
       );
-    } catch (error) {
-      console.error("Error deleting comment:", error);
     } finally {
       setDeleting(false);
       handleMenuClose();

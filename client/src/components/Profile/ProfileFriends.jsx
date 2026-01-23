@@ -8,12 +8,13 @@ import {
   Button,
 } from "@mui/material";
 import { useSelector } from "react-redux";
+import api from "../../App/services/api";
 
 export default function ProfileFriends() {
   const theme = useTheme();
 
   const user = useSelector((s) => s.auth.user);
-
+  
   let friends = user.friends;
 
   return (
@@ -57,26 +58,21 @@ export default function ProfileFriends() {
           let profileImage = friend.photo ? (
             <Avatar
               sx={{
-                width: 90,
-                height: 90,
-                p: 8,
-
+                width: 120,
+                height: 120,
                 border: `4px solid ${theme.palette.background.default}`,
-                bgcolor: theme.palette.primary.main,
                 color: "white",
                 fontSize: 48,
                 fontWeight: 700,
               }}
-              src={`${api.getUri()}/../public/${friend.photo}`}
+              src={`${api.getUri()}/../storage/${friend.photo}`}
             ></Avatar>
           ) : (
             <Avatar
               sx={{
-                width: 90,
-                height: 90,
-                p: 8,
+                width: 120,
+                height: 120,
                 border: `4px solid ${theme.palette.background.default}`,
-                bgcolor: theme.palette.primary.main,
                 color: "white",
                 fontSize: 48,
                 fontWeight: 700,

@@ -102,7 +102,6 @@ const Home = () => {
       setCombinedPosts((prev) => {
         const postExists = prev.some((post) => post.id === newPost.id);
         if (postExists) {
-          console.warn("Post already exists in feed");
           return prev;
         }
 

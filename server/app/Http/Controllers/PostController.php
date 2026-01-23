@@ -290,11 +290,20 @@ class PostController extends Controller
 
         $page = request()->input('page') ?? 1;
         $userId = request()->user()->id;
-        $posts = Post::where('post_privacy', 'PUB')->with(['comments.user', 'user'])->withCount('likes', 'comments')->withExists([
-            'likes as isLiked' => function ($q) use ($userId) {
-                $q->where('user_id', $userId);
-            }
-        ])->orderBy('id', 'Desc')->paginate(10, ['*'], 'page', $page);
+
+        $userFriendsIds = request()->user()->friends()->pluck('friend_id');
+
+        $posts = Post::where(function ($q) use ($userFriendsIds) {
+            return $q->where('post_privacy', 'PUB')->orWhere(function ($q) use ($userFriendsIds) {
+                $q->whereIn('user_id', $userFriendsIds)
+                    ->where('post_privacy', 'FRI');
+            });
+        })
+            ->with(['comments.user', 'user'])->withCount('likes', 'comments')->withExists([
+                    'likes as isLiked' => function ($q) use ($userId) {
+                        $q->where('user_id', $userId);
+                    }
+                ])->orderBy('id', 'Desc')->paginate(10, ['*'], 'page', $page);
 
 
         return Response::json([

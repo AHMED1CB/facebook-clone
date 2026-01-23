@@ -432,7 +432,6 @@ export default function EditPostModal({
         Alert.error("Update Failed", "Failed to update post");
       }
     } catch (err) {
-      console.error("Update error:", err);
       Alert.error("Update Failed", err.message || "Something went wrong");
     } finally {
       setLoading(false);

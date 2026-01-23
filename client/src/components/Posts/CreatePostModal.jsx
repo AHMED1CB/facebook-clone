@@ -430,7 +430,6 @@ export default ({ open, onClose, onUpload }) => {
         Alert.error("Upload Failed", "Failed to create post");
       }
     } catch (error) {
-      console.error("Upload error:", error);
       Alert.error("Upload Failed", error.message || "Something went wrong");
     } finally {
       setLoading(false);

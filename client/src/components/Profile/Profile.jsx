@@ -33,6 +33,7 @@ const Profile = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
+  console.log(activePost)
   const onUpload = (newPost) => {
     setPosts((prev) => {
       const postExists = prev.some((post) => post.id === newPost.id);
