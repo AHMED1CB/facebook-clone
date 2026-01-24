@@ -33,28 +33,24 @@ const Home = () => {
   const [open, setOpen] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  
   useEffect(() => {
     dispatch(getPosts(1));
   }, [dispatch]);
 
-  
   useEffect(() => {
     if (
       !isLoadingMore &&
       combinedPosts.length === 0 &&
       postsFromRedux.length > 0
     ) {
-      
       setCombinedPosts(postsFromRedux);
       return;
     }
 
     if (isLoadingMore) {
-      
       setCombinedPosts((prev) => {
         if (!postsFromRedux || postsFromRedux.length === 0) {
-          setHasMore(false); 
+          setHasMore(false);
           return prev;
         }
 
@@ -68,7 +64,6 @@ const Home = () => {
     }
   }, [postsFromRedux, isLoadingMore, combinedPosts.length]);
 
-  
   const lastPostElementRef = useCallback(
     (node) => {
       if (state === "Loading" || isLoadingMore || !hasMore) return;

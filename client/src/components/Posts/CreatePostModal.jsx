@@ -14,6 +14,10 @@ import {
   useTheme,
   alpha,
   CircularProgress,
+  Fade,
+  Badge,
+  Chip,
+  Tooltip,
 } from "@mui/material";
 import {
   Close,
@@ -23,6 +27,13 @@ import {
   LockOutlined,
   CheckCircle,
   Videocam,
+  EmojiEmotions,
+  LocationOn,
+  Tag,
+  Gif,
+  InsertEmoticon,
+  Image,
+  VideoCameraBack,
 } from "@mui/icons-material";
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -45,8 +56,8 @@ export default ({ open, onClose, onUpload }) => {
   const [selectedPrivacy, setSelectedPrivacy] = useState("public");
   const [loading, setLoading] = useState(false);
   const [isVideoUploading, setIsVideoUploading] = useState(false);
-
   const [hasVideo, setHasVideo] = useState(false);
+  const [charCount, setCharCount] = useState(0);
 
   const handlePrivacyClick = (event) => {
     setPrivacyAnchorEl(event.currentTarget);
@@ -58,28 +69,25 @@ export default ({ open, onClose, onUpload }) => {
 
   const handlePrivacySelect = (privacy) => {
     setSelectedPrivacy(privacy);
-
     let privacies = {
       public: "PUB",
       private: "PRIV",
       friends: "FRI",
     };
-
     setPost({ ...post, post_privacy: privacies[privacy] });
-
     handlePrivacyClose();
   };
 
   const getPrivacyIcon = () => {
     switch (selectedPrivacy) {
       case "public":
-        return <PublicOutlined sx={{ fontSize: 16 }} />;
+        return <PublicOutlined sx={{ fontSize: 18 }} />;
       case "friends":
-        return <GroupOutlined sx={{ fontSize: 16 }} />;
+        return <GroupOutlined sx={{ fontSize: 18 }} />;
       case "private":
-        return <LockOutlined sx={{ fontSize: 16 }} />;
+        return <LockOutlined sx={{ fontSize: 18 }} />;
       default:
-        return <PublicOutlined sx={{ fontSize: 16 }} />;
+        return <PublicOutlined sx={{ fontSize: 18 }} />;
     }
   };
 
@@ -99,210 +107,52 @@ export default ({ open, onClose, onUpload }) => {
   const getPrivacyDescription = () => {
     switch (selectedPrivacy) {
       case "public":
-        return "Anyone on or off the platform";
+        return "Anyone can see this";
       case "friends":
-        return "Your friends only";
+        return "Only your friends";
       case "private":
-        return "Only you can see this";
+        return "Only you can see";
       default:
-        return "Anyone on or off the platform";
+        return "Anyone can see this";
     }
   };
 
-  const styles = {
-    modal: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      backdropFilter: "blur(5px)",
-    },
-    modalContainer: {
-      minWidth: "80vw",
-      maxWidth: "90vw",
-      maxHeight: "90vh",
-      overflow: "hidden",
-      outline: "none",
-      boxShadow: theme.shadows[24],
-      [theme.breakpoints.down("sm")]: {
-        width: "95vw",
-      },
-    },
-    modalHeader: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: theme.spacing(2),
-      borderBottom: `1px solid ${theme.palette.divider}`,
-      backgroundColor: theme.palette.background.paper,
-    },
-    modalTitle: {
-      fontWeight: 600,
-      fontSize: "1.25rem",
-      color: theme.palette.text.primary,
-    },
-    userSection: {
-      display: "flex",
-      alignItems: "center",
-      padding: theme.spacing(2),
-      gap: theme.spacing(1.5),
-      backgroundColor: theme.palette.background.paper,
-    },
-    userInfo: {
-      flex: 1,
-    },
-    userName: {
-      fontWeight: 600,
-      fontSize: "0.9375rem",
-      color: theme.palette.text.primary,
-      marginBottom: theme.spacing(0.5),
-    },
-    audienceButton: {
-      display: "flex",
-      alignItems: "center",
-      gap: theme.spacing(0.5),
-      padding: `${theme.spacing(0.5)} ${theme.spacing(1)}`,
-      borderRadius: theme.shape.borderRadius,
-      border: `1px solid ${theme.palette.grey[300]}`,
-      cursor: "pointer",
-      width: "fit-content",
-      "&:hover": {
-        backgroundColor: theme.palette.action.hover,
-      },
-    },
-    audienceText: {
-      fontSize: "0.8125rem",
-      fontWeight: 500,
-      color: theme.palette.text.secondary,
-    },
-    textAreaContainer: {
-      padding: theme.spacing(0, 2, 2),
-      backgroundColor: theme.palette.background.paper,
-    },
-    textArea: {
-      width: "100%",
-      border: "none",
-      outline: "none",
-      resize: "none",
-      fontSize: "1.5rem",
-      fontFamily: "inherit",
-      minHeight: "120px",
-      color: theme.palette.text.primary,
-      backgroundColor: "transparent",
-      "&::placeholder": {
-        color: theme.palette.text.disabled,
-      },
-    },
-    mediaPreviewContainer: {
-      margin: theme.spacing(0, 2, 2),
-      position: "relative",
-      backgroundColor: theme.palette.background.paper,
-      overflow: "hidden",
-    },
-    mediaPreview: {
-      width: "100%",
-      maxHeight: "300px",
-      objectFit: "cover",
-      backgroundColor: theme.palette.grey[100],
-    },
-    videoPreview: {
-      width: "100%",
-      maxHeight: "300px",
-      backgroundColor: "#000",
-    },
-    removeButton: {
-      position: "absolute",
-      top: theme.spacing(1),
-      right: theme.spacing(1),
-      backgroundColor: alpha(theme.palette.common.black, 0.7),
-      color: "white",
-      "&:hover": {
-        backgroundColor: theme.palette.common.black,
-      },
-    },
-    actionButtons: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: theme.spacing(2),
-      borderTop: `1px solid ${theme.palette.divider}`,
-      borderBottom: `1px solid ${theme.palette.divider}`,
-      backgroundColor: theme.palette.background.paper,
-    },
-    actionTitle: {
-      fontWeight: 500,
-      fontSize: "0.9375rem",
-      color: theme.palette.text.primary,
-    },
-    actionIcons: {
-      display: "flex",
-      alignItems: "center",
-      gap: theme.spacing(0.5),
-    },
-    actionIconButton: {
-      padding: theme.spacing(1),
-      color: theme.palette.text.secondary,
-      "&:hover": {
-        backgroundColor: theme.palette.action.hover,
-      },
-    },
-    modalFooter: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: theme.spacing(2),
-      backgroundColor: theme.palette.background.paper,
-    },
-    privacyInfo: {
-      display: "flex",
-      alignItems: "center",
-      gap: theme.spacing(1),
-    },
-    privacyText: {
-      fontSize: "0.875rem",
-      color: theme.palette.text.secondary,
-    },
-    postButton: {
-      fontWeight: 600,
-      textTransform: "none",
-      padding: `${theme.spacing(0.75)} ${theme.spacing(3)}`,
-      fontSize: "0.9375rem",
-      minWidth: "100px",
-    },
-    privacyMenuItem: {
-      minWidth: "200px",
-      padding: theme.spacing(1.5, 2),
-    },
-    privacyMenuIcon: {
-      minWidth: "40px",
-      color: theme.palette.text.secondary,
-    },
-    selectedPrivacyIcon: {
-      color: theme.palette.primary.main,
-    },
-    iconColor: {
-      photo: theme.palette.success.main,
-      video: theme.palette.error.main,
-    },
-    uploadOverlay: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: alpha(theme.palette.common.black, 0.5),
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 1,
-    },
+  const getPrivacyColor = () => {
+    switch (selectedPrivacy) {
+      case "public":
+        return theme.palette.success.main;
+      case "friends":
+        return theme.palette.info.main;
+      case "private":
+        return theme.palette.warning.main;
+      default:
+        return theme.palette.success.main;
+    }
   };
 
   const user = useSelector((s) => s.auth.user);
 
   let profileImage = user.photo ? (
-    <Avatar src={`${api.getUri()}/../storage/${user.photo}`}></Avatar>
+    <Avatar
+      src={`${api.getUri()}/../storage/${user.photo}`}
+      sx={{
+        width: 44,
+        height: 44,
+        border: `2px solid ${theme.palette.primary.main}20`,
+      }}
+    />
   ) : (
-    <Avatar>{user.name[0]}</Avatar>
+    <Avatar
+      sx={{
+        width: 44,
+        height: 44,
+        bgcolor: theme.palette.primary.main,
+        fontSize: "1.1rem",
+        fontWeight: 600,
+      }}
+    >
+      {user.name[0].toUpperCase()}
+    </Avatar>
   );
 
   const imgInputRef = useRef(null);
@@ -318,7 +168,6 @@ export default ({ open, onClose, onUpload }) => {
     }
 
     setHasVideo(false);
-
     setPost({
       ...post,
       post_type: "IMG",
@@ -349,12 +198,10 @@ export default ({ open, onClose, onUpload }) => {
     }
 
     setHasVideo(true);
-
     setPost({
       ...post,
       post_type: "VID",
       post_content: file,
-
       subtext: post.subtext || "",
     });
 
@@ -370,14 +217,22 @@ export default ({ open, onClose, onUpload }) => {
       ...post,
       post_type: "TXT",
       post_content: "",
-
       subtext: post.post_type === "TXT" ? post.subtext : "",
     });
     setMediaPath(null);
     setHasVideo(false);
-
     if (imgInputRef.current) imgInputRef.current.value = "";
     if (videoInputRef.current) videoInputRef.current.value = "";
+  };
+
+  const handleTextChange = (e) => {
+    const text = e.target.value;
+    setCharCount(text.length);
+    setPost({
+      ...post,
+      subtext: text,
+      post_content: post.post_type === "TXT" ? text.trim() : post.post_content,
+    });
   };
 
   const uploadPost = async () => {
@@ -403,7 +258,6 @@ export default ({ open, onClose, onUpload }) => {
 
     try {
       let form = new FormData();
-
       form.append("post_privacy", post.post_privacy);
       form.append("post_type", post.post_type);
 
@@ -426,6 +280,7 @@ export default ({ open, onClose, onUpload }) => {
         setMediaPath(null);
         setHasVideo(false);
         setSelectedPrivacy("public");
+        setCharCount(0);
       } else {
         Alert.error("Upload Failed", "Failed to create post");
       }
@@ -438,232 +293,507 @@ export default ({ open, onClose, onUpload }) => {
   };
 
   return (
-    <Modal open={open} onClose={onClose} sx={styles.modal}>
-      <Paper sx={styles.modalContainer}>
-        <Box sx={styles.modalHeader}>
-          <Typography sx={styles.modalTitle}>Create New Post</Typography>
-          <IconButton onClick={onClose} size="small">
-            <Close />
-          </IconButton>
-        </Box>
-
-        <Box sx={styles.userSection}>
-          {profileImage}
-          <Box sx={styles.userInfo}>
-            <Typography sx={styles.userName}>{user.name}</Typography>
-            <Box sx={styles.audienceButton} onClick={handlePrivacyClick}>
-              {getPrivacyIcon()}
-              <Typography sx={styles.audienceText}>
-                {getPrivacyText()}
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
-
-        <Menu
-          anchorEl={privacyAnchorEl}
-          open={Boolean(privacyAnchorEl)}
-          onClose={handlePrivacyClose}
-          PaperProps={{
-            sx: {
-              width: 320,
-              boxShadow: theme.shadows[8],
-              marginTop: theme.spacing(1),
-            },
-          }}
-          MenuListProps={{
-            sx: { padding: 0 },
+    <Modal
+      open={open}
+      onClose={onClose}
+      closeAfterTransition
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backdropFilter: "blur(8px)",
+      }}
+    >
+      <Fade in={open}>
+        <Paper
+          sx={{
+            width: { xs: "95vw", sm: "600px", md: "650px" },
+            maxHeight: "90vh",
+            overflow: "hidden",
+            borderRadius: 3,
+            boxShadow: theme.shadows[24],
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-          <Box sx={{ padding: theme.spacing(2) }}>
+          {/* Header */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+              p: 2.5,
+              borderBottom: `1px solid ${theme.palette.divider}`,
+              bgcolor: theme.palette.background.paper,
+            }}
+          >
+            <Typography
+              sx={{
+                fontWeight: 700,
+                fontSize: "1.25rem",
+                color: theme.palette.text.primary,
+              }}
+            >
+              Create Post
+            </Typography>
+            <IconButton
+              onClick={onClose}
+              size="small"
+              sx={{
+                position: "absolute",
+                right: 16,
+                bgcolor: theme.palette.action.hover,
+                "&:hover": {
+                  bgcolor: theme.palette.action.selected,
+                },
+              }}
+            >
+              <Close />
+            </IconButton>
+          </Box>
+
+          {/* User Info & Privacy */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              p: 2.5,
+              gap: 2,
+              borderBottom: `1px solid ${theme.palette.divider}`,
+              bgcolor: theme.palette.background.paper,
+            }}
+          >
+            {profileImage}
+            <Box sx={{ flex: 1 }}>
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  fontSize: "1rem",
+                  color: theme.palette.text.primary,
+                  mb: 0.5,
+                }}
+              >
+                {user.name}
+              </Typography>
+              <Chip
+                icon={getPrivacyIcon()}
+                label={getPrivacyText()}
+                onClick={handlePrivacyClick}
+                size="small"
+                sx={{
+                  bgcolor: getPrivacyColor() + "15",
+                  color: getPrivacyColor(),
+                  fontWeight: 600,
+                  fontSize: "0.8rem",
+                  height: 28,
+                  "& .MuiChip-icon": {
+                    color: getPrivacyColor(),
+                    fontSize: 16,
+                  },
+                  "&:hover": {
+                    bgcolor: getPrivacyColor() + "25",
+                  },
+                }}
+              />
+            </Box>
+          </Box>
+
+          {/* Privacy Menu */}
+          <Menu
+            anchorEl={privacyAnchorEl}
+            open={Boolean(privacyAnchorEl)}
+            onClose={handlePrivacyClose}
+            PaperProps={{
+              sx: {
+                width: 340,
+                borderRadius: 2,
+                boxShadow: theme.shadows[10],
+                mt: 1,
+                border: `1px solid ${theme.palette.divider}`,
+                overflow: "hidden",
+              },
+            }}
+          >
+            <Box sx={{ p: 2, pb: 1 }}>
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  fontSize: "1.1rem",
+                  color: theme.palette.text.primary,
+                }}
+              >
+                Select Audience
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: "0.85rem",
+                  color: theme.palette.text.secondary,
+                  mt: 0.5,
+                }}
+              >
+                Choose who can see your post
+              </Typography>
+            </Box>
+            <Divider />
+
+            {[
+              {
+                value: "public",
+                icon: PublicOutlined,
+                label: "Public",
+                desc: "Anyone can see this",
+              },
+              {
+                value: "friends",
+                icon: GroupOutlined,
+                label: "Friends",
+                desc: "Only your friends",
+              },
+              {
+                value: "private",
+                icon: LockOutlined,
+                label: "Only me",
+                desc: "Only you can see",
+              },
+            ].map((item) => (
+              <MenuItem
+                key={item.value}
+                onClick={() => handlePrivacySelect(item.value)}
+                sx={{
+                  py: 2,
+                  px: 2.5,
+                  gap: 2,
+                  "&:hover": {
+                    bgcolor: theme.palette.action.hover,
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    bgcolor: getPrivacyColor() + "15",
+                    color: getPrivacyColor(),
+                  }}
+                >
+                  <item.icon />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography sx={{ fontWeight: 600, fontSize: "0.95rem" }}>
+                    {item.label}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: "0.85rem",
+                      color: theme.palette.text.secondary,
+                    }}
+                  >
+                    {item.desc}
+                  </Typography>
+                </Box>
+                {selectedPrivacy === item.value && (
+                  <CheckCircle sx={{ color: theme.palette.primary.main }} />
+                )}
+              </MenuItem>
+            ))}
+          </Menu>
+
+          {/* Text Area */}
+          <Box sx={{ flex: 1, overflow: "auto" }}>
+            <Box sx={{ p: 2.5, position: "relative" }}>
+              <textarea
+                placeholder={
+                  hasVideo
+                    ? "Add a caption for your video..."
+                    : "What's on your mind?"
+                }
+                value={post.subtext || ""}
+                onChange={handleTextChange}
+                style={{
+                  width: "100%",
+                  border: "none",
+                  outline: "none",
+                  resize: "none",
+                  fontSize: "1.5rem",
+                  fontFamily: "inherit",
+                  minHeight: "150px",
+                  color: theme.palette.text.primary,
+                  backgroundColor: "transparent",
+                  lineHeight: 1.6,
+                  "&::placeholder": {
+                    color: theme.palette.text.disabled,
+                  },
+                }}
+              />
+              <Typography
+                sx={{
+                  position: "absolute",
+                  bottom: 8,
+                  right: 16,
+                  fontSize: "0.75rem",
+                  color:
+                    charCount > 0
+                      ? theme.palette.text.secondary
+                      : "transparent",
+                }}
+              >
+                {charCount} characters
+              </Typography>
+            </Box>
+
+            {/* Media Preview */}
+            {mediaPath && (
+              <Box
+                sx={{
+                  m: 2.5,
+                  mt: 0,
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  position: "relative",
+                  border: `1px solid ${theme.palette.divider}`,
+                }}
+              >
+                {isVideoUploading && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      bgcolor: alpha(theme.palette.common.black, 0.7),
+                      zIndex: 2,
+                    }}
+                  >
+                    <CircularProgress color="primary" />
+                    <Typography sx={{ color: "white", ml: 2, fontWeight: 500 }}>
+                      Uploading video...
+                    </Typography>
+                  </Box>
+                )}
+
+                {post.post_type === "IMG" ? (
+                  <Box
+                    component="img"
+                    src={mediaPath}
+                    alt="Preview"
+                    sx={{
+                      width: "100%",
+                      maxHeight: 400,
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                  />
+                ) : (
+                  <Box
+                    component="video"
+                    src={mediaPath}
+                    controls
+                    sx={{
+                      width: "100%",
+                      maxHeight: 400,
+                      backgroundColor: "#000",
+                      display: "block",
+                    }}
+                  />
+                )}
+
+                <IconButton
+                  onClick={clearMedia}
+                  disabled={isVideoUploading}
+                  sx={{
+                    position: "absolute",
+                    top: 12,
+                    right: 12,
+                    bgcolor: alpha(theme.palette.common.black, 0.7),
+                    color: "white",
+                    "&:hover": {
+                      bgcolor: theme.palette.common.black,
+                    },
+                  }}
+                >
+                  <Close />
+                </IconButton>
+              </Box>
+            )}
+
+            {/* Media Type Badge */}
+            {post.post_type !== "TXT" && (
+              <Box sx={{ px: 2.5, mb: 2 }}>
+                <Chip
+                  icon={
+                    post.post_type === "IMG" ? (
+                      <Image fontSize="small" />
+                    ) : (
+                      <VideoCameraBack fontSize="small" />
+                    )
+                  }
+                  label={`${post.post_type === "IMG" ? "Photo" : "Video"} post`}
+                  size="small"
+                  sx={{
+                    bgcolor: theme.palette.primary.main + "15",
+                    color: theme.palette.primary.main,
+                    fontWeight: 500,
+                    "& .MuiChip-icon": {
+                      color: theme.palette.primary.main,
+                    },
+                  }}
+                />
+              </Box>
+            )}
+          </Box>
+
+          {/* Action Buttons */}
+          <Box
+            sx={{
+              p: 2.5,
+              borderTop: `1px solid ${theme.palette.divider}`,
+              borderBottom: `1px solid ${theme.palette.divider}`,
+              bgcolor: theme.palette.background.paper,
+            }}
+          >
             <Typography
               sx={{
                 fontWeight: 600,
-                fontSize: "1rem",
+                fontSize: "0.95rem",
                 color: theme.palette.text.primary,
-                marginBottom: theme.spacing(0.5),
+                mb: 2,
               }}
             >
-              Who can see your {hasVideo ? "video" : "post"}?
+              Add to your post
             </Typography>
-            <Typography
-              sx={{
-                fontSize: "0.875rem",
-                color: theme.palette.text.secondary,
-                lineHeight: 1.4,
-              }}
-            >
-              {getPrivacyDescription()}
-            </Typography>
-          </Box>
-
-          <Divider />
-
-          <MenuItem
-            onClick={() => handlePrivacySelect("public")}
-            sx={styles.privacyMenuItem}
-          >
-            <ListItemIcon sx={styles.privacyMenuIcon}>
-              <PublicOutlined />
-            </ListItemIcon>
-            <ListItemText
-              primary="Public"
-              secondary="Anyone on or off the platform"
-            />
-            {selectedPrivacy === "public" && (
-              <CheckCircle sx={styles.selectedPrivacyIcon} />
-            )}
-          </MenuItem>
-
-          <MenuItem
-            onClick={() => handlePrivacySelect("friends")}
-            sx={styles.privacyMenuItem}
-          >
-            <ListItemIcon sx={styles.privacyMenuIcon}>
-              <GroupOutlined />
-            </ListItemIcon>
-            <ListItemText primary="Friends" secondary="Your friends only" />
-            {selectedPrivacy === "friends" && (
-              <CheckCircle sx={styles.selectedPrivacyIcon} />
-            )}
-          </MenuItem>
-
-          <MenuItem
-            onClick={() => handlePrivacySelect("private")}
-            sx={styles.privacyMenuItem}
-          >
-            <ListItemIcon sx={styles.privacyMenuIcon}>
-              <LockOutlined />
-            </ListItemIcon>
-            <ListItemText primary="Only me" secondary="Only you can see this" />
-            {selectedPrivacy === "private" && (
-              <CheckCircle sx={styles.selectedPrivacyIcon} />
-            )}
-          </MenuItem>
-        </Menu>
-
-        <Box sx={styles.textAreaContainer}>
-          <textarea
-            placeholder={
-              hasVideo
-                ? "Add a caption for your video..."
-                : "What's on your mind..."
-            }
-            style={styles.textArea}
-            value={post.subtext || ""}
-            onChange={(e) =>
-              setPost({
-                ...post,
-                subtext: e.target.value,
-
-                post_content:
-                  post.post_type === "TXT"
-                    ? e.target.value.trim()
-                    : post.post_content,
-              })
-            }
-          />
-        </Box>
-
-        {(post.post_type === "IMG" || post.post_type === "VID") &&
-          mediaPath && (
-            <Box sx={styles.mediaPreviewContainer}>
-              {isVideoUploading && (
-                <Box sx={styles.uploadOverlay}>
-                  <CircularProgress color="primary" />
-                  <Typography sx={{ color: "white", ml: 2 }}>
-                    Uploading video...
-                  </Typography>
-                </Box>
-              )}
-
-              {post.post_type === "IMG" ? (
-                <Box
-                  component="img"
-                  src={mediaPath}
-                  alt="Preview"
-                  sx={styles.mediaPreview}
-                />
-              ) : (
-                <Box
-                  component="video"
-                  src={mediaPath}
-                  controls
-                  sx={styles.videoPreview}
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Tooltip title="Add Photo" arrow>
+                <IconButton
+                  onClick={() => imgInputRef.current.click()}
+                  disabled={hasVideo || isVideoUploading}
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 2,
+                    bgcolor: theme.palette.success.main + "15",
+                    color: theme.palette.success.main,
+                    "&:hover": {
+                      bgcolor: theme.palette.success.main + "25",
+                    },
+                  }}
                 >
-                  Your browser does not support the video tag.
-                </Box>
-              )}
+                  <PhotoCamera />
+                </IconButton>
+              </Tooltip>
 
-              <IconButton
-                size="small"
-                sx={styles.removeButton}
-                onClick={clearMedia}
-                disabled={isVideoUploading}
-              >
-                <Close fontSize="small" />
-              </IconButton>
+              <Tooltip title="Add Video" arrow>
+                <IconButton
+                  onClick={() => videoInputRef.current.click()}
+                  disabled={post.post_type === "IMG" || isVideoUploading}
+                  sx={{
+                    p: 1.5,
+                    borderRadius: 2,
+                    bgcolor: theme.palette.error.main + "15",
+                    color: theme.palette.error.main,
+                    "&:hover": {
+                      bgcolor: theme.palette.error.main + "25",
+                    },
+                  }}
+                >
+                  <Videocam />
+                </IconButton>
+              </Tooltip>
             </Box>
-          )}
-
-        <Box sx={styles.actionButtons}>
-          <Typography sx={styles.actionTitle}>Add to your post</Typography>
-          <Box sx={styles.actionIcons}>
-            <IconButton
-              sx={styles.actionIconButton}
-              onClick={() => imgInputRef.current.click()}
-              disabled={hasVideo || isVideoUploading}
-              title="Add photo"
-            >
-              <PhotoCamera sx={{ color: styles.iconColor.photo }} />
-            </IconButton>
-
-            <IconButton
-              sx={styles.actionIconButton}
-              onClick={() => videoInputRef.current.click()}
-              disabled={post.post_type === "IMG" || isVideoUploading}
-              title="Add video"
-            >
-              <Videocam sx={{ color: styles.iconColor.video }} />
-            </IconButton>
           </Box>
-        </Box>
 
-        {/* Hidden file inputs */}
-        <input
-          type="file"
-          hidden
-          accept="image/*"
-          ref={imgInputRef}
-          onChange={handleImageChanged}
-        />
-
-        <input
-          type="file"
-          hidden
-          accept="video/*"
-          ref={videoInputRef}
-          onChange={handleVideoChanged}
-        />
-
-        <Box sx={styles.modalFooter}>
-          <Box sx={styles.privacyInfo}>
-            {getPrivacyIcon()}
-            <Typography sx={styles.privacyText}>
-              {getPrivacyText()} • {getPrivacyDescription()}
-            </Typography>
-          </Box>
-          <Button
-            variant="contained"
-            disableElevation
-            sx={styles.postButton}
-            onClick={uploadPost}
-            disabled={loading || isVideoUploading}
+          {/* Footer */}
+          <Box
+            sx={{
+              p: 2.5,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              bgcolor: theme.palette.background.paper,
+            }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Post"}
-          </Button>
-        </Box>
-      </Paper>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor: getPrivacyColor() + "15",
+                  color: getPrivacyColor(),
+                }}
+              >
+                {getPrivacyIcon()}
+              </Box>
+              <Box>
+                <Typography sx={{ fontWeight: 600, fontSize: "0.9rem" }}>
+                  {getPrivacyText()}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "0.8rem",
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  {getPrivacyDescription()}
+                </Typography>
+              </Box>
+            </Box>
+            <Button
+              variant="contained"
+              onClick={uploadPost}
+              disabled={loading || isVideoUploading}
+              sx={{
+                fontWeight: 700,
+                textTransform: "none",
+                px: 4,
+                py: 1,
+                borderRadius: 2,
+                fontSize: "1rem",
+                minWidth: 120,
+                bgcolor: theme.palette.primary.main,
+                "&:hover": {
+                  bgcolor: theme.palette.primary.dark,
+                },
+                "&.Mui-disabled": {
+                  bgcolor: theme.palette.action.disabled,
+                },
+              }}
+            >
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Post"
+              )}
+            </Button>
+          </Box>
+
+          {/* Hidden file inputs */}
+          <input
+            type="file"
+            hidden
+            accept="image/*"
+            ref={imgInputRef}
+            onChange={handleImageChanged}
+          />
+          <input
+            type="file"
+            hidden
+            accept="video/*"
+            ref={videoInputRef}
+            onChange={handleVideoChanged}
+          />
+        </Paper>
+      </Fade>
     </Modal>
   );
 };

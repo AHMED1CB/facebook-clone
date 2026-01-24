@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -16,9 +16,9 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Chip,
 } from "@mui/material";
 import {
-  ThumbUp as ThumbUpIcon,
   ChatBubbleOutline as CommentIcon,
   Public as PublicIcon,
   MoreHoriz as MoreHorizIcon,
@@ -26,16 +26,19 @@ import {
   Delete as DeleteIcon,
   Share as ShareIcon,
   Report as ReportIcon,
-  Bookmark as BookmarkIcon,
+  BookmarkBorder as BookmarkBorderIcon,
+  Favorite as FavoriteIcon,
+  FavoriteBorder as FavoriteBorderIcon,
 } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import api from "../../App/services/api";
 import Alert from "../../App/Alert/Swal";
 import VideoPlayer from "./VideoPlayer";
 
-export default ({ post, ref, onLike, onDelete , onCommentsOpen , onEdit }) => {
+export default ({ post, ref, onLike, onDelete, onCommentsOpen, onEdit }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [isHovered, setIsHovered] = useState(false);
   const open = Boolean(anchorEl);
 
   const authUser = useSelector((s) => s.auth.user);
@@ -53,7 +56,7 @@ export default ({ post, ref, onLike, onDelete , onCommentsOpen , onEdit }) => {
 
     switch (action) {
       case "edit":
-        onEdit()
+        onEdit();
         break;
       case "delete":
         let check = await Alert.confirm("Post Deletion", "Are You Sure");
@@ -62,23 +65,48 @@ export default ({ post, ref, onLike, onDelete , onCommentsOpen , onEdit }) => {
         }
         break;
       case "share":
-        
+        // Share functionality
         break;
       case "report":
-        
+        // Report functionality
         break;
       case "save":
-        
+        // Save functionality
         break;
       default:
         break;
     }
   };
 
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+
   let profileImage = user.photo ? (
-    <Avatar src={`${api.getUri()}/../storage/${user.photo}`}></Avatar>
+    <Avatar
+      src={`${api.getUri()}/../storage/${user.photo}`}
+      sx={{
+        width: 44,
+        height: 44,
+        border: `2px solid ${theme.palette.primary.main}20`,
+      }}
+    />
   ) : (
-    <Avatar>{user.name.slice(0, 2).toUpperCase()}</Avatar>
+    <Avatar
+      sx={{
+        width: 44,
+        height: 44,
+        bgcolor: theme.palette.primary.main,
+        fontSize: "1rem",
+        fontWeight: 600,
+      }}
+    >
+      {user.name.slice(0, 2).toUpperCase()}
+    </Avatar>
   );
 
   let mediaPath =
@@ -89,23 +117,46 @@ export default ({ post, ref, onLike, onDelete , onCommentsOpen , onEdit }) => {
   return (
     <Card
       sx={{
-        mb: 2,
+        mb: 3,
         borderRadius: 2,
         bgcolor: theme.palette.background.paper,
         width: "100% !important",
+        boxShadow: isHovered
+          ? "0 6px 20px rgba(0,0,0,0.08)"
+          : "0 1px 3px rgba(0,0,0,0.05)",
+        transition: "all 0.2s ease",
+        overflow: "hidden",
+        border: `1px solid ${theme.palette.divider}`,
       }}
       ref={ref ?? null}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <CardHeader
         avatar={profileImage}
         action={
-          <>
+          <Box>
+            {post.post_type !== "TXT" && post.post_type && (
+              <Chip
+                label={post.post_type}
+                size="small"
+                sx={{
+                  mr: 1,
+                  bgcolor: theme.palette.primary.main + "15",
+                  color: theme.palette.primary.main,
+                  fontWeight: 500,
+                  fontSize: "0.7rem",
+                }}
+              />
+            )}
             <IconButton
               onClick={handleMenuClick}
               aria-label="post options"
-              aria-controls={open ? "post-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
+              size="small"
+              sx={{
+                bgcolor: isHovered ? "action.hover" : "transparent",
+                transition: "background-color 0.2s",
+              }}
             >
               <MoreHorizIcon />
             </IconButton>
@@ -126,99 +177,168 @@ export default ({ post, ref, onLike, onDelete , onCommentsOpen , onEdit }) => {
                 elevation: 3,
                 sx: {
                   mt: 1,
-                  minWidth: 180,
+                  minWidth: 200,
+                  borderRadius: 2,
+                  border: `1px solid ${theme.palette.divider}`,
                 },
               }}
             >
               {user.id === authUser.id && (
-                <MenuItem onClick={() => handleMenuItemClick("edit")}>
+                <MenuItem
+                  onClick={() => handleMenuItemClick("edit")}
+                  sx={{ py: 1.2 }}
+                >
                   <ListItemIcon>
-                    <EditIcon fontSize="small" />
+                    <EditIcon fontSize="small" color="primary" />
                   </ListItemIcon>
-                  <ListItemText>Edit Post</ListItemText>
+                  <ListItemText
+                    primary="Edit Post"
+                    primaryTypographyProps={{ variant: "body2" }}
+                  />
                 </MenuItem>
               )}
 
               {user.id === authUser.id && (
-                <MenuItem onClick={() => handleMenuItemClick("delete")}>
+                <MenuItem
+                  onClick={() => handleMenuItemClick("delete")}
+                  sx={{ py: 1.2 }}
+                >
                   <ListItemIcon>
-                    <DeleteIcon fontSize="small" />
+                    <DeleteIcon fontSize="small" color="error" />
                   </ListItemIcon>
-                  <ListItemText>Delete Post</ListItemText>
+                  <ListItemText
+                    primary="Delete Post"
+                    primaryTypographyProps={{ variant: "body2" }}
+                  />
                 </MenuItem>
               )}
 
-              <MenuItem onClick={() => handleMenuItemClick("share")}>
+              <MenuItem
+                onClick={() => handleMenuItemClick("share")}
+                sx={{ py: 1.2 }}
+              >
                 <ListItemIcon>
-                  <ShareIcon fontSize="small" />
+                  <ShareIcon fontSize="small" color="action" />
                 </ListItemIcon>
-                <ListItemText>Share</ListItemText>
+                <ListItemText
+                  primary="Share"
+                  primaryTypographyProps={{ variant: "body2" }}
+                />
               </MenuItem>
 
-              <MenuItem onClick={() => handleMenuItemClick("save")}>
+              <MenuItem
+                onClick={() => handleMenuItemClick("save")}
+                sx={{ py: 1.2 }}
+              >
                 <ListItemIcon>
-                  <BookmarkIcon fontSize="small" />
+                  <BookmarkBorderIcon fontSize="small" color="action" />
                 </ListItemIcon>
-                <ListItemText>Save Post</ListItemText>
+                <ListItemText
+                  primary="Save Post"
+                  primaryTypographyProps={{ variant: "body2" }}
+                />
               </MenuItem>
 
               {user.id !== authUser.id && (
-                <MenuItem onClick={() => handleMenuItemClick("report")}>
+                <MenuItem
+                  onClick={() => handleMenuItemClick("report")}
+                  sx={{ py: 1.2 }}
+                >
                   <ListItemIcon>
-                    <ReportIcon fontSize="small" />
+                    <ReportIcon fontSize="small" color="warning" />
                   </ListItemIcon>
-                  <ListItemText>Report</ListItemText>
+                  <ListItemText
+                    primary="Report"
+                    primaryTypographyProps={{ variant: "body2" }}
+                  />
                 </MenuItem>
               )}
             </Menu>
-          </>
-        }
-        title={
-          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-            {user.name}
-          </Typography>
-        }
-        subheader={
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <Typography variant="caption" color="text.secondary">
-              {post.creation_date || "Now"}
-            </Typography>
-            <Typography variant="caption">•</Typography>
-            <PublicIcon
-              sx={{ fontSize: 12, color: theme.palette.text.secondary }}
-            />
           </Box>
         }
+        title={
+          <Box>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: 700, fontSize: "1rem" }}
+            >
+              {user.name}
+            </Typography>
+            <Box
+              sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.2 }}
+            >
+              <PublicIcon
+                sx={{ fontSize: 14, color: theme.palette.text.secondary }}
+              />
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontWeight: 500 }}
+              >
+                {post.creation_date || "Now"}
+              </Typography>
+            </Box>
+          </Box>
+        }
+        sx={{
+          pb: 1.5,
+          borderBottom: `1px solid ${theme.palette.divider}`,
+          alignItems: "flex-start",
+        }}
       />
+
       {post.post_type == "TXT" && (
-        <CardContent sx={{ pt: 0 }}>
-          <Typography variant="body1" color="text.primary">
+        <CardContent sx={{ pt: 2.5, pb: 3 }}>
+          <Typography
+            variant="body1"
+            color="text.primary"
+            sx={{
+              fontSize: "1.05rem",
+              lineHeight: 1.6,
+              whiteSpace: "pre-line",
+            }}
+          >
             {post.post_content}
           </Typography>
         </CardContent>
       )}
+
       {post.post_type !== "TXT" &&
         post.subtext &&
         post.subtext.trim() != "" && (
-          <CardContent sx={{ pt: 0 }}>
-            <Typography variant="body1" color="text.primary">
+          <CardContent sx={{ pt: 2.5, pb: post.post_type === "TXT" ? 3 : 2 }}>
+            <Typography
+              variant="body1"
+              color="text.primary"
+              sx={{
+                fontSize: "1.05rem",
+                lineHeight: 1.6,
+                whiteSpace: "pre-line",
+                mb: post.post_type !== "TXT" ? 2 : 0,
+              }}
+            >
               {post.subtext}
             </Typography>
           </CardContent>
         )}
+
       {post.post_type == "IMG" && (
         <CardMedia
           component="img"
           image={mediaPath}
           alt="Post image"
-          sx={{ maxHeight: 500, objectFit: "cover" }}
+          sx={{
+            maxHeight: 600,
+            objectFit: "cover",
+            width: "100%",
+            display: "block",
+          }}
         />
       )}
 
-      {post.post_type == "VID" && (
-        <VideoPlayer src={mediaPath}/>
-      )}
-      <Box sx={{ px: 2, py: 1 }}>
+      {post.post_type == "VID" && <VideoPlayer src={mediaPath} />}
+
+      <Box sx={{ px: 2.5, py: 1.5 }}>
         <Box
           sx={{
             display: "flex",
@@ -226,38 +346,60 @@ export default ({ post, ref, onLike, onDelete , onCommentsOpen , onEdit }) => {
             alignItems: "center",
           }}
         >
-          <Typography variant="body2" color="text.secondary">
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <Box
-              component="span"
-              sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+                bgcolor: theme.palette.primary.main + "15",
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 20,
+              }}
             >
-              <Box
-                component="span"
+              <FavoriteIcon
                 sx={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: "50%",
-                  bgcolor: theme.palette.primary.main,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "0.7rem",
+                  fontSize: 16,
+                  color: theme.palette.primary.main,
                 }}
+              />
+              <Typography
+                variant="body2"
+                color="primary"
+                sx={{ fontWeight: 600 }}
               >
-                👍
-              </Box>
-              {post.likes_count}
+                {post.likes_count}
+              </Typography>
             </Box>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {post.comments_count} Comments
-          </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+                color: theme.palette.text.secondary,
+              }}
+            >
+              <CommentIcon sx={{ fontSize: 16 }} />
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                {post.comments_count}
+              </Typography>
+            </Box>
+          </Box>
         </Box>
       </Box>
+
       <Divider />
-      <CardActions sx={{ justifyContent: "space-around", py: 0.5 }}>
+
+      <CardActions sx={{ justifyContent: "space-around", p: 0.5 }}>
         <Button
-          startIcon={<ThumbUpIcon />}
+          startIcon={
+            post.isLiked ? (
+              <FavoriteIcon sx={{ color: theme.palette.primary.main }} />
+            ) : (
+              <FavoriteBorderIcon />
+            )
+          }
           sx={{
             textTransform: "none",
             color: post.isLiked
@@ -265,6 +407,12 @@ export default ({ post, ref, onLike, onDelete , onCommentsOpen , onEdit }) => {
               : theme.palette.text.secondary,
             flex: 1,
             fontWeight: 600,
+            fontSize: "0.95rem",
+            borderRadius: 1,
+            py: 1.2,
+            "&:hover": {
+              bgcolor: theme.palette.primary.main + "08",
+            },
           }}
           onClick={onLike}
         >
@@ -277,6 +425,12 @@ export default ({ post, ref, onLike, onDelete , onCommentsOpen , onEdit }) => {
             color: theme.palette.text.secondary,
             flex: 1,
             fontWeight: 600,
+            fontSize: "0.95rem",
+            borderRadius: 1,
+            py: 1.2,
+            "&:hover": {
+              bgcolor: theme.palette.action.hover,
+            },
           }}
           onClick={onCommentsOpen}
         >
