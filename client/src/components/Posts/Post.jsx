@@ -62,13 +62,13 @@ export default ({ post, ref, onLike, onDelete , onCommentsOpen , onEdit }) => {
         }
         break;
       case "share":
-        // Handle share logic
+        
         break;
       case "report":
-        // Handle report logic
+        
         break;
       case "save":
-        // Handle save logic
+        
         break;
       default:
         break;

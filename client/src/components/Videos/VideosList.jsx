@@ -2,40 +2,31 @@ import { useState, useRef, useEffect } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import VideoCard from "./VideoCard";
 
-export default ({ videos, setActivePost, setOpen }) => {
+export default ({ videos, setActivePost, setOpen, onEndReached }) => {
   const theme = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
   const containerRef = useRef(null);
 
   const handleNext = () => {
-    if (currentIndex < videos.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
+    if (currentIndex < videos.length - 1) setCurrentIndex((prev) => prev + 1);
   };
 
   const handlePrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
+    if (currentIndex > 0) setCurrentIndex((prev) => prev - 1);
   };
 
   useEffect(() => {
-    if (containerRef.current) {
-      const element = containerRef.current.children[currentIndex];
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+    if (
+      currentIndex === videos.length - 1 &&
+      typeof onEndReached === "function"
+    ) {
+      onEndReached(currentIndex);
     }
-  }, [currentIndex]);
+  }, [currentIndex, videos.length, onEndReached]);
 
   const handleWheel = (e) => {
-    if (e.deltaY > 0) {
-      handleNext();
-    } else {
-      handlePrev();
-    }
-
-    return false;
+    if (e.deltaY > 0) handleNext();
+    else handlePrev();
   };
 
   const onCommentClicked = (post) => {
@@ -59,35 +50,29 @@ export default ({ videos, setActivePost, setOpen }) => {
           height: "100%",
           overflowY: "auto",
           scrollSnapType: "y mandatory",
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
+          "&::-webkit-scrollbar": { display: "none" },
           scrollbarWidth: "none",
         }}
       >
         {videos.length === 0 && (
           <Typography
-            component={"h2"}
+            component="h2"
             sx={{ fontSize: "40px", color: "gray", p: 3, textAlign: "center" }}
           >
             No Videos Yet
           </Typography>
         )}
 
-        {videos.map((video, index) => (
+        {videos.map((video) => (
           <Box
             key={video.id}
-            sx={{
-              scrollSnapAlign: "start",
-              scrollSnapStop: "always",
-            }}
+            sx={{ scrollSnapAlign: "start", scrollSnapStop: "always" }}
           >
             <VideoCard video={video} onCommentClicked={onCommentClicked} />
           </Box>
         ))}
       </Box>
 
-      {/* Video Counter */}
       <Box
         sx={{
           position: "fixed",

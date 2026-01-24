@@ -1,4 +1,4 @@
-// utils/Alert.js
+
 import Swal from 'sweetalert2';
 
 class Alert {
@@ -11,7 +11,7 @@ class Alert {
     static init(muiTheme) {
         this.theme = muiTheme;
 
-        // Configure SweetAlert2 with theme
+        
         Swal.mixin({
             customClass: {
                 confirmButton: 'MuiButton-root MuiButton-contained',
@@ -21,7 +21,7 @@ class Alert {
             buttonsStyling: false,
         });
 
-        // Add global CSS for high z-index
+        
         if (typeof document !== 'undefined') {
             const style = document.createElement('style');
             style.innerHTML = `
@@ -98,7 +98,7 @@ class Alert {
                 cancelButton: 'swal-cancel-btn',
             },
             didOpen: (popup) => {
-                // Ensure maximum z-index on open
+                
                 popup.style.zIndex = '999999';
                 const backdrop = popup.parentElement.querySelector('.swal2-backdrop-show');
                 if (backdrop) {
@@ -107,7 +107,7 @@ class Alert {
             }
         });
 
-        return result.isConfirmed; // returns true or false
+        return result.isConfirmed; 
     }
 
     /**
@@ -337,7 +337,7 @@ class Alert {
                 }
             `;
 
-            // Remove existing style if any
+            
             const existingStyle = document.getElementById('swal-custom-zindex');
             if (existingStyle) {
                 existingStyle.remove();

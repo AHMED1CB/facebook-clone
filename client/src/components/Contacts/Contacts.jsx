@@ -51,9 +51,10 @@ export default ({ contacts }) => {
         {contacts.map((contact, index) => {
           contact = contact.friend;
           const contactAvatar = contact.photo ? (
-            <Avatar sx={{ width: 36, height: 36 }}>
-              {`${api.getUri()}/../sorage/app/public/${contact.photo}`}
-            </Avatar>
+            <Avatar
+              sx={{ width: 36, height: 36 }}
+              src={`${api.getUri()}/../storage/${contact.photo}`}
+            ></Avatar>
           ) : (
             <Avatar sx={{ width: 36, height: 36 }}>
               {contact.name.slice(0, 2).toUpperCase()}

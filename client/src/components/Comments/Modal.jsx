@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import {
   Modal,
   Box,
@@ -34,239 +34,231 @@ export default function CommentsModal({
   const [deleting, setDeleting] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedComment, setSelectedComment] = useState(null);
+
   const authUser = useSelector((s) => s.auth.user);
   const { setPosts } = useContext(PostContext);
+
   useEffect(() => {
-    if (post) {
-      setComments(post.comments);
-    }
+    if (post?.comments) setComments(post.comments);
   }, [post]);
 
-  const addComment = async () => {
-    if (!text.trim()) return;
-    let id = post.id;
+  const addComment = useCallback(async () => {
+    if (!text.trim() || !post) return;
 
-    let commentData = {
-      content: text.trim(),
-    };
+    setLoading(true);
+    try {
+      const res = await comment(post.id, { content: text.trim() });
+      const newComment = res?.data?.data?.comment;
+      if (!newComment) return;
 
-    setLoading(() => true);
+      onComment(newComment);
 
-    const uploadedComment = await comment(id, commentData);
-    if (uploadedComment?.data?.data?.comment) {
-      onComment(uploadedComment.data.data.comment);
-    }
-    if (setPosts) {
-      setPosts((posts) =>
+      setComments((prev) => [...prev, newComment]);
+      setPosts?.((posts) =>
         posts.map((p) =>
           p.id === post.id
-            ? {
-                ...p,
-                comments: [...p.comments, uploadedComment.data.data.comment],
-              }
+            ? { ...p, comments: [...p.comments, newComment] }
             : p,
         ),
       );
-    }
-    setComments([...comments, uploadedComment.data.data.comment]);
-    setText("");
-    setLoading(() => false);
-  };
 
-  const handleMenuOpen = (event, comment) => {
+      setText("");
+    } finally {
+      setLoading(false);
+    }
+  }, [text, post, onComment, setPosts]);
+
+  const handleMenuOpen = useCallback((event, comment) => {
     setAnchorEl(event.currentTarget);
     setSelectedComment(comment);
-  };
+  }, []);
 
-  const handleMenuClose = () => {
+  const handleMenuClose = useCallback(() => {
     setAnchorEl(null);
     setSelectedComment(null);
-  };
+  }, []);
 
-  const deleteComment = async () => {
-    if (!selectedComment) return;
+  const handleDeleteComment = useCallback(async () => {
+    if (!selectedComment || !post) return;
+
     setDeleting(true);
     try {
       await deleteCommentById(selectedComment.id);
 
-      const updatedComments = comments.filter(
-        (c) => c.id !== selectedComment.id,
-      );
-      setComments(updatedComments);
+      setComments((prev) => prev.filter((c) => c.id !== selectedComment.id));
       onDelete(selectedComment.id);
-      if (setPosts) {
-        setPosts((posts) =>
-          posts.map((p) =>
-            p.id === post.id ? { ...p, comments: updatedComments } : p,
-          ),
-        );
-      }
+
+      setPosts?.((posts) =>
+        posts.map((p) =>
+          p.id === post.id
+            ? {
+                ...p,
+                comments: p.comments.filter((c) => c.id !== selectedComment.id),
+              }
+            : p,
+        ),
+      );
     } finally {
       setDeleting(false);
       handleMenuClose();
     }
-  };
+  }, [selectedComment, post, onDelete, setPosts, handleMenuClose]);
 
-  const canDeleteComment = (comment) => {
-    // Allow delete if user is the comment author or the post owner
-    return authUser.id === comment?.user?.id || !comment.user;
-  };
-
-  useEffect(() => {
-    if (post) {
-      setComments(post.comments);
-    }
-  }, [post]);
+  const canDeleteComment = useCallback(
+    (comment) => authUser.id === comment?.user?.id || !comment.user,
+    [authUser.id],
+  );
 
   return (
-    comments && (
-      <Modal
-        open={open}
-        onClose={onClose}
-        sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+    <Modal
+      open={open}
+      onClose={onClose}
+      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+    >
+      <Box
+        sx={{
+          maxHeight: "85vh",
+          width: "90vw",
+          bgcolor: "background.paper",
+          borderRadius: 3,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
       >
+        {/* Header */}
         <Box
           sx={{
-            maxHeight: "85vh",
-            width: "90vw",
-            bgcolor: "background.paper",
-            borderRadius: 3,
+            p: 2,
+            borderBottom: 1,
+            borderColor: "divider",
             display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
+            justifyContent: "space-between",
           }}
         >
-          {/* Header */}
-          <Box
-            sx={{
-              p: 2,
-              borderBottom: 1,
-              borderColor: "divider",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography fontWeight={700}>Comments</Typography>
-            <IconButton onClick={onClose}>
-              <Close />
-            </IconButton>
-          </Box>
-
-          {/* List */}
-          <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
-            {loading ? (
-              <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-                <CircularProgress />
-              </Box>
-            ) : comments.length ? (
-              <List disablePadding>
-                {comments.map((c, i) => {
-                  return (
-                    <React.Fragment key={c.id}>
-                      <ListItem alignItems="flex-start">
-                        <ListItemAvatar>
-                          <Avatar
-                            src={`${api.getUri()}/../storage/${c?.user?.photo ?? (!c.user ? authUser.photo : "")}`}
-                          />
-                        </ListItemAvatar>
-                        <ListItemText
-                          primary={
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                              }}
-                            >
-                              <Typography component="span" fontWeight={700}>
-                                {c?.user?.name || authUser?.name}
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                component="span"
-                              >
-                                {c.time}
-                              </Typography>
-                            </Box>
-                          }
-                          secondary={
-                            <Typography component="span" sx={{ my: 1 }}>
-                              {c.content}
-                            </Typography>
-                          }
-                          secondaryTypographyProps={{ component: "span" }}
-                        />
-
-                        {canDeleteComment(c) && (
-                          <IconButton
-                            size="small"
-                            onClick={(e) => handleMenuOpen(e, c)}
-                            disabled={deleting}
-                            sx={{ ml: 1 }}
-                          >
-                            <MoreVert fontSize="small" />
-                          </IconButton>
-                        )}
-                      </ListItem>
-                      {i < comments.length - 1 && <Divider />}
-                    </React.Fragment>
-                  );
-                })}
-              </List>
-            ) : (
-              <Typography align="center" color="text.secondary">
-                No comments yet
-              </Typography>
-            )}
-          </Box>
-
-          {/* Delete Menu */}
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-          >
-            <MenuItem onClick={deleteComment} disabled={deleting}>
-              {deleting ? (
-                <CircularProgress size={20} sx={{ mr: 1 }} />
-              ) : (
-                <Delete fontSize="small" sx={{ mr: 1 }} />
-              )}
-              Delete Comment
-            </MenuItem>
-          </Menu>
-
-          {/* Input */}
-          <Box
-            sx={{
-              p: 2,
-              borderTop: 1,
-              borderColor: "divider",
-              display: "flex",
-              gap: 1,
-            }}
-          >
-            <Avatar src={`${api.getUri()}/../storage/${authUser.photo}`} />
-            <TextField
-              fullWidth
-              multiline
-              maxRows={4}
-              placeholder="Write a comment..."
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === "Enter" &&
-                !e.shiftKey &&
-                (e.preventDefault(), addComment())
-              }
-            />
-            <IconButton onClick={addComment} disabled={!text.trim()}>
-              <Send />
-            </IconButton>
-          </Box>
+          <Typography fontWeight={700}>Comments</Typography>
+          <IconButton onClick={onClose}>
+            <Close />
+          </IconButton>
         </Box>
-      </Modal>
-    )
+
+        {/* List */}
+        <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+          {loading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : comments.length ? (
+            <List disablePadding>
+              {comments.map((c, i) => {
+                const user = c.user || authUser;
+                const avatarSrc = `${api.getUri()}/../storage/${user?.photo || ""}`;
+
+                return (
+                  <React.Fragment key={c.id}>
+                    <ListItem alignItems="flex-start">
+                      <ListItemAvatar>
+                        <Avatar src={avatarSrc} />
+                      </ListItemAvatar>
+
+                      <ListItemText
+                        primary={
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <Typography component="span" fontWeight={700}>
+                              {user?.name}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              component="span"
+                            >
+                              {c.time}
+                            </Typography>
+                          </Box>
+                        }
+                        secondary={
+                          <Typography component="span" sx={{ my: 1 }}>
+                            {c.content}
+                          </Typography>
+                        }
+                        secondaryTypographyProps={{ component: "span" }}
+                      />
+
+                      {canDeleteComment(c) && (
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleMenuOpen(e, c)}
+                          disabled={deleting}
+                          sx={{ ml: 1 }}
+                        >
+                          <MoreVert fontSize="small" />
+                        </IconButton>
+                      )}
+                    </ListItem>
+                    {i < comments.length - 1 && <Divider />}
+                  </React.Fragment>
+                );
+              })}
+            </List>
+          ) : (
+            <Typography align="center" color="text.secondary">
+              No comments yet
+            </Typography>
+          )}
+        </Box>
+
+        {/* Delete Menu */}
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+        >
+          <MenuItem onClick={handleDeleteComment} disabled={deleting}>
+            {deleting ? (
+              <CircularProgress size={20} sx={{ mr: 1 }} />
+            ) : (
+              <Delete fontSize="small" sx={{ mr: 1 }} />
+            )}
+            Delete Comment
+          </MenuItem>
+        </Menu>
+
+        {/* Input */}
+        <Box
+          sx={{
+            p: 2,
+            borderTop: 1,
+            borderColor: "divider",
+            display: "flex",
+            gap: 1,
+          }}
+        >
+          <Avatar src={`${api.getUri()}/../storage/${authUser.photo}`} />
+          <TextField
+            fullWidth
+            multiline
+            maxRows={4}
+            placeholder="Write a comment..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                addComment();
+              }
+            }}
+          />
+          <IconButton onClick={addComment} disabled={!text.trim()}>
+            <Send />
+          </IconButton>
+        </Box>
+      </Box>
+    </Modal>
   );
 }
