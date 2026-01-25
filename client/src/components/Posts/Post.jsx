@@ -369,7 +369,7 @@ export default ({ post, ref, onLike, onDelete, onCommentsOpen, onEdit }) => {
                 color="primary"
                 sx={{ fontWeight: 600 }}
               >
-                {post.likes_count}
+                {Number.isNaN(post.likes_count) ? 1 : post.likes_count}
               </Typography>
             </Box>
             <Box
