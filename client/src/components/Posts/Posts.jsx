@@ -4,11 +4,11 @@ import { useContext, useEffect, useState } from "react";
 import PostContext from "../../App/Context/PostsContext";
 import { DeletePost, like } from "../../App/services/postservices";
 import Alert from "../../App/Alert/Swal";
-import { useDispatch } from "react-redux";
 import { setPosts } from "../../App/Redux/Features/Posts/PostsSlice";
+import { useDispatch } from "react-redux";
 
 export default ({ user, lastElementRef, openCommentsPlace, openEditModal }) => {
-  const { posts, setPosts: cSetPosts } = useContext(PostContext);
+  const { posts, setPosts } = useContext(PostContext);
   const theme = useTheme();
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
@@ -27,37 +27,20 @@ export default ({ user, lastElementRef, openCommentsPlace, openEditModal }) => {
     }
 
     setLoading(() => true);
-    if (cSetPosts) {
-      cSetPosts((old) =>
-        old.map((post, i) =>
-          i === idx
-            ? {
-                ...post,
-                likes_count: post.isLiked
-                  ? post.likes_count - 1
-                  : post.likes_count + 1,
-                isLiked: !post.isLiked,
-              }
-            : post,
-        ),
-      );
-    } else {
-      dispatch(
-        setPosts((old) =>
-          old.map((post, i) =>
-            i === idx
-              ? {
-                  ...post,
-                  likes_count: post.isLiked
-                    ? post.likes_count - 1
-                    : post.likes_count + 1,
-                  isLiked: !post.isLiked,
-                }
-              : post,
-          ),
-        ),
-      );
-    }
+
+    setPosts(
+      posts.map((post, i) =>
+        i === idx
+          ? {
+              ...post,
+              likes_count: post.isLiked
+                ? post.likes_count - 1
+                : post.likes_count + 1,
+              isLiked: !post.isLiked,
+            }
+          : post,
+      ),
+    );
 
     await like(posts[idx].id);
 

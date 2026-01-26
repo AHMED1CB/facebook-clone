@@ -7,7 +7,6 @@ import {
   Fab,
   Zoom,
   useScrollTrigger,
-  Chip,
   Alert as MuiAlert,
   Button,
   Drawer,
@@ -28,8 +27,6 @@ import EditPostModal from "../Posts/EditPostModal";
 import {
   ArrowUpward,
   Refresh,
-  Group,
-  TrendingUp,
   People,
   Menu,
   Close,
@@ -130,7 +127,14 @@ const Home = () => {
   };
 
   return (
-    <PostContext.Provider value={{ posts, setPosts }}>
+    <PostContext.Provider
+      value={{
+        posts,
+        setPosts: (p) => {
+          dispatch(setPosts(p));
+        },
+      }}
+    >
       <Box
         sx={{
           minHeight: "100vh",
@@ -147,15 +151,15 @@ const Home = () => {
             alignItems: "center",
             justifyContent: "space-between",
             p: 2,
-            mt:1,
+            mt: 1,
             bgcolor: theme.palette.background.paper,
             borderBottom: `1px solid ${theme.palette.divider}`,
             position: "fixed",
-            width:'90%',
-            left:'50%',
-            transform:'translateX(-50%)',
-            borderRadius:'12px',
-            top:65,
+            width: "90%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            borderRadius: "12px",
+            top: 65,
             zIndex: 1100,
           }}
         >
@@ -232,7 +236,7 @@ const Home = () => {
               lg={7}
               xl={8}
               sx={{
-                width: { sm: "100%", lg:'70% ' },
+                width: { sm: "100%", lg: "70% " },
 
                 px: { xs: 0, sm: 0 },
               }}
@@ -244,8 +248,8 @@ const Home = () => {
                   width: "100%",
                   borderRadius: 2,
                   border: `1px solid ${theme.palette.divider}`,
-                  mt: {sm:10,lg:0},
-                  mb:3
+                  mt: { sm: 10, lg: 0 },
+                  mb: 3,
                 }}
               >
                 <CreatePost setOpen={setOpen} />

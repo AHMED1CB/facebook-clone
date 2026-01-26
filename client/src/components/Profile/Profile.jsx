@@ -32,7 +32,6 @@ const Profile = ({ userData }) => {
 
   const [posts, setPosts] = useState([]);
 
-  // Scroll to top functionality
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 100,
