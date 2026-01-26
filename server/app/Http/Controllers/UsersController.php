@@ -24,14 +24,11 @@ class UsersController extends Controller
 
         $user = User::with([
             'posts' => function ($q) use ($authUserId, $userFriendsIds) {
-                $q->where(function ($q) use ($authUserId, $userFriendsIds) {
-                    $q->where(function ($q) use ($authUserId) {
-                        $q->where('user_id', $authUserId)
-                            ->where('post_privacy', 'PUB');
-                    })->orWhere(function ($q) use ($userFriendsIds) {
-                        $q->whereIn('user_id', $userFriendsIds)
-                            ->where('post_privacy', 'FRI');
-                    });
+                $q->where(function ($q) use ($authUserId) {
+                    $q->where('post_privacy', 'PUB');
+                })->orWhere(function ($q) use ($userFriendsIds) {
+                    $q->whereIn('user_id', $userFriendsIds)
+                        ->where('post_privacy', 'FRI');
                 })
                     ->with(['comments.user', 'user'])
                     ->withCount('likes', 'comments')
