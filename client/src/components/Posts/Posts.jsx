@@ -55,7 +55,7 @@ export default ({ user, lastElementRef, openCommentsPlace, openEditModal }) => {
 
     let post = posts[idx];
     await DeletePost(post.id);
-    dispatch(setPosts(posts.filter((p) => p.id !== post.id)));
+    setPosts(posts.filter((p) => p.id !== post.id));
 
     setLoading(() => false);
   };
