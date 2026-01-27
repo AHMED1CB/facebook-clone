@@ -31,7 +31,7 @@ export default () => {
   const theme = useTheme();
   const [menuAnchor, setMenuAnchor] = useState(null);
   const menuOpen = Boolean(menuAnchor);
-  const user = useSelector(s => s.auth.user)
+  const user = useSelector((s) => s.auth.user);
 
   const handleMenuClick = (event) => {
     setMenuAnchor(event.currentTarget);
@@ -52,9 +52,9 @@ export default () => {
       icon: <LogoutIcon />,
       text: "Log Out",
       divider: false,
-      event: () => {
+      event: async () => {
         Cookie.remove("authorization");
-        go("auth/register");
+        location.reload();
       },
     },
   ];

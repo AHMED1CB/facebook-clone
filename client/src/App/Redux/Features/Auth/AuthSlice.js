@@ -12,11 +12,13 @@ export const authSlice = createSlice({
     reducers: {
         setUser: (s, a) => {
             s.user = a.payload
+        },
+        clear: (s, a) => {
+            s.user = null
         }
     },
     extraReducers: (b) => {
         // User
-
         b.addCase(getAuthorizedUser.pending, (s) => {
             s.loading = true;
             s.state = 'Loading'
@@ -32,6 +34,6 @@ export const authSlice = createSlice({
     }
 })
 
-export const { setUser } = authSlice.actions
+export const { setUser, clear } = authSlice.actions
 
 export default authSlice.reducer
