@@ -16,7 +16,6 @@ import {
   Fade,
   Zoom,
   alpha,
-  useMediaQuery,
 } from "@mui/material";
 import {
   Facebook as FacebookIcon,
@@ -53,26 +52,30 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     const check = loginSchema.safeParse(data);
+
     setIsLoading(() => true);
+
     if (!check.success) {
       setError(() => JSON.parse(check.error)[0].message);
+
       setIsLoading(() => false);
+      return;
+    }
+    const response = await login(data);
+
+    if (response.code === 200) {
+      let token = response.data.data.token;
+      Cookie.set("authorization", `Bearer ${token}`, 3);
+      go("/");
+      return;
     } else {
-      const response = await login(data);
-
-      if (response.code === 200) {
-        let token = response.data.data.token;
-        Cookie.set("authorization", `Bearer ${token}`, 3);
-        go("/");
-      } else {
-        if (response.code == 500) {
-          setError("Something Went Wrong Try Again Later");
-          return;
-        }
-        setError("Invalid Data or User Not exists");
+      if (response.code == 500) {
+        setError("Something Went Wrong Try Again Later");
+        return;
       }
-
+      setError("Invalid Data or User Not exists");
       setIsLoading(() => false);
     }
   };

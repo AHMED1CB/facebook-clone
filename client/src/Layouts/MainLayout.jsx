@@ -17,10 +17,10 @@ export default () => {
       go("/auth/register");
       return;
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
-    if (!user) {
+    if (!user && token) {
       dispatch(getAuthorizedUser(token));
     }
   }, [user]);
