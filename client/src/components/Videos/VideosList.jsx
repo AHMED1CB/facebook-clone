@@ -38,7 +38,7 @@ export default ({ videos, setActivePost, setOpen, onEndReached }) => {
     <Box
       sx={{
         position: "relative",
-        height: "95vh",
+        height: "100vh",
         overflow: "hidden",
         bgcolor: theme.palette.grey[900],
       }}
@@ -47,7 +47,7 @@ export default ({ videos, setActivePost, setOpen, onEndReached }) => {
       <Box
         ref={containerRef}
         sx={{
-          height: "100%",
+          height: "100vh",
           overflowY: "auto",
           scrollSnapType: "y mandatory",
           "&::-webkit-scrollbar": { display: "none" },
@@ -71,24 +71,6 @@ export default ({ videos, setActivePost, setOpen, onEndReached }) => {
             <VideoCard video={video} onCommentClicked={onCommentClicked} />
           </Box>
         ))}
-      </Box>
-
-      <Box
-        sx={{
-          position: "fixed",
-          top: 80,
-          right: 20,
-          bgcolor: "rgba(0, 0, 0, 0.6)",
-          color: "white",
-          px: 2,
-          py: 1,
-          borderRadius: 2,
-          zIndex: 10,
-        }}
-      >
-        <Typography variant="caption">
-          {currentIndex + 1} / {videos.length}
-        </Typography>
       </Box>
     </Box>
   );

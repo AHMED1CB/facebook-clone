@@ -27,4 +27,30 @@ const update = async (data) => {
 
 
 
-export { update }
+// Able to Find users also
+const search = async (data) => {
+
+    try {
+        const response = await api.get(`/search/${data}`, {
+            headers: {
+                Authorization: Cookie.get('authorization'),
+            }
+        });
+        return {
+            data: response.data,
+            message: "Success",
+            code: response.status
+        }
+    } catch (error) {
+        return {
+            data: {},
+            message: 'Fail',
+            code: error?.status ?? 500,
+            error: error
+
+        }
+    }
+}
+
+
+export { update, search }

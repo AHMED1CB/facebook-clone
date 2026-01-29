@@ -2,38 +2,25 @@ import {
   Card,
   CardContent,
   CardMedia,
-  CardActions,
   Avatar,
   Typography,
   Box,
-  Button,
-  Chip,
   IconButton,
   Stack,
-  Divider,
   alpha,
   useTheme,
 } from "@mui/material";
 import {
-  PersonAdd,
-  Message,
-  Favorite,
-  ChatBubbleOutline,
-  Share,
-  MoreHoriz,
   CheckCircle,
   Public,
-  Lock,
-  Group,
-  Photo,
   CalendarToday,
-  People,
-  Bookmark,
+  OpenInNew,
 } from "@mui/icons-material";
+import api from "../../App/services/api";
+import VideoPlayer from "../Posts/VideoPlayer";
 
-const SearchResultCard = ({ result, type }) => {
+const SearchResultCard = ({ result }) => {
   const theme = useTheme();
-
   const getInitials = (name) => {
     return name
       ?.split(" ")
@@ -43,7 +30,7 @@ const SearchResultCard = ({ result, type }) => {
       .slice(0, 2);
   };
 
-  if (type === "people") {
+  if (result.type === "people") {
     return (
       <Card
         elevation={0}
@@ -59,14 +46,19 @@ const SearchResultCard = ({ result, type }) => {
         }}
       >
         <CardContent sx={{ p: 3 }}>
-          <Stack direction="row" spacing={3}>
+          <Stack
+            direction="row"
+            spacing={3}
+            alignItems={"center"}
+            sx={{ cursor: "pointer" }}
+          >
             {/* Avatar Section */}
             <Box sx={{ position: "relative" }}>
               <Avatar
+                src={`${api.getUri()}/../storage/${result.photo}`}
                 sx={{
-                  width: 96,
-                  height: 96,
-                  fontSize: 32,
+                  width: 75,
+                  height: 75,
                   fontWeight: 700,
                   bgcolor: alpha(theme.palette.primary.main, 0.1),
                   color: theme.palette.primary.main,
@@ -75,28 +67,6 @@ const SearchResultCard = ({ result, type }) => {
               >
                 {getInitials(result.name)}
               </Avatar>
-              {result.verified && (
-                <Box
-                  sx={{
-                    position: "absolute",
-                    bottom: 0,
-                    right: 0,
-                    bgcolor: theme.palette.primary.main,
-                    borderRadius: "50%",
-                    p: 0.5,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <CheckCircle
-                    sx={{
-                      fontSize: 20,
-                      color: "white",
-                    }}
-                  />
-                </Box>
-              )}
             </Box>
 
             {/* Content Section */}
@@ -134,91 +104,7 @@ const SearchResultCard = ({ result, type }) => {
                       {result.bio}
                     </Typography>
                   )}
-
-                  {/* Tags */}
-                  {result.tags && result.tags.length > 0 && (
-                    <Box
-                      sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}
-                    >
-                      {result.tags.map((tag) => (
-                        <Chip
-                          key={tag}
-                          label={tag}
-                          size="small"
-                          sx={{
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
-                            color: theme.palette.primary.main,
-                            fontWeight: 500,
-                            borderRadius: 1,
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  )}
-
-                  {/* Mutual Friends */}
-                  {result.mutualFriends && (
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <People
-                        sx={{
-                          fontSize: 16,
-                          color: theme.palette.text.secondary,
-                        }}
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        {result.mutualFriends} mutual friends
-                      </Typography>
-                    </Box>
-                  )}
                 </Box>
-
-                {/* Action Buttons */}
-                <CardActions sx={{ p: 0 }}>
-                  <Stack direction="row" spacing={1.5}>
-                    <Button
-                      variant="contained"
-                      startIcon={<PersonAdd />}
-                      sx={{
-                        textTransform: "none",
-                        fontWeight: 600,
-                        borderRadius: 2,
-                        px: 3,
-                        bgcolor: theme.palette.primary.main,
-                        "&:hover": {
-                          bgcolor: theme.palette.primary.dark,
-                        },
-                      }}
-                    >
-                      Add Friend
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      startIcon={<Message />}
-                      sx={{
-                        textTransform: "none",
-                        fontWeight: 500,
-                        borderRadius: 2,
-                        px: 3,
-                        borderColor: alpha(theme.palette.divider, 0.5),
-                        color: theme.palette.text.primary,
-                        "&:hover": {
-                          borderColor: theme.palette.primary.main,
-                          bgcolor: alpha(theme.palette.primary.main, 0.04),
-                        },
-                      }}
-                    >
-                      Message
-                    </Button>
-                    <IconButton
-                      sx={{
-                        border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-                        borderRadius: 2,
-                      }}
-                    >
-                      <MoreHoriz />
-                    </IconButton>
-                  </Stack>
-                </CardActions>
               </Stack>
             </Box>
           </Stack>
@@ -227,7 +113,7 @@ const SearchResultCard = ({ result, type }) => {
     );
   }
 
-  if (type === "posts") {
+  if (result.type === "posts") {
     return (
       <Card
         elevation={0}
@@ -242,10 +128,10 @@ const SearchResultCard = ({ result, type }) => {
           },
         }}
       >
-        {/* Header */}
         <CardContent sx={{ p: 3, pb: 2 }}>
           <Stack direction="row" spacing={2} alignItems="flex-start">
             <Avatar
+              src={`${api.getUri()}/../storage/${result.user.photo}`}
               sx={{
                 width: 48,
                 height: 48,
@@ -255,7 +141,7 @@ const SearchResultCard = ({ result, type }) => {
                 color: theme.palette.primary.main,
               }}
             >
-              {getInitials(result.author?.name)}
+              {getInitials(result.user.name)}
             </Avatar>
             <Box sx={{ flex: 1 }}>
               <Stack
@@ -273,7 +159,7 @@ const SearchResultCard = ({ result, type }) => {
                     }}
                   >
                     <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                      {result.author?.name}
+                      {result.user.name}
                     </Typography>
                     <Public
                       sx={{ fontSize: 14, color: theme.palette.text.secondary }}
@@ -284,12 +170,12 @@ const SearchResultCard = ({ result, type }) => {
                       <CalendarToday
                         sx={{ fontSize: 12, verticalAlign: "middle", mr: 0.5 }}
                       />
-                      {result.time}
+                      {result.creation_date}
                     </Typography>
                   </Box>
                 </Box>
                 <IconButton size="small">
-                  <MoreHoriz />
+                  <OpenInNew />
                 </IconButton>
               </Stack>
             </Box>
@@ -306,11 +192,10 @@ const SearchResultCard = ({ result, type }) => {
               color: theme.palette.text.primary,
             }}
           >
-            {result.content}
+            {result.subtext}
           </Typography>
 
-          {/* Image */}
-          {result.image && (
+          {result.type === "IMG" && (
             <Box
               sx={{
                 borderRadius: 2,
@@ -321,7 +206,7 @@ const SearchResultCard = ({ result, type }) => {
             >
               <CardMedia
                 component="img"
-                image={result.image}
+                image={`${api.getUri()}/../storage/${result.post_content}`}
                 alt="Post image"
                 sx={{
                   width: "100%",
@@ -332,314 +217,24 @@ const SearchResultCard = ({ result, type }) => {
             </Box>
           )}
 
-          {/* Stats */}
-          <Stack direction="row" spacing={3} sx={{ mb: 2 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Favorite
-                sx={{ fontSize: 16, color: theme.palette.error.main }}
-              />
-              <Typography variant="body2" color="text.secondary">
-                {result.likes}
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <ChatBubbleOutline
-                sx={{ fontSize: 16, color: theme.palette.text.secondary }}
-              />
-              <Typography variant="body2" color="text.secondary">
-                {result.comments} comments
-              </Typography>
-            </Box>
-          </Stack>
-
-          <Divider sx={{ my: 1 }} />
-
-          {/* Actions */}
-          <CardActions sx={{ p: 0 }}>
-            <Stack direction="row" spacing={1} sx={{ width: "100%" }}>
-              <Button
-                fullWidth
-                startIcon={<Favorite />}
-                sx={{
-                  textTransform: "none",
-                  color: theme.palette.text.secondary,
-                  borderRadius: 2,
-                  "&:hover": {
-                    bgcolor: alpha(theme.palette.error.main, 0.08),
-                    color: theme.palette.error.main,
-                  },
-                }}
-              >
-                Like
-              </Button>
-              <Button
-                fullWidth
-                startIcon={<ChatBubbleOutline />}
-                sx={{
-                  textTransform: "none",
-                  color: theme.palette.text.secondary,
-                  borderRadius: 2,
-                  "&:hover": {
-                    bgcolor: alpha(theme.palette.primary.main, 0.08),
-                    color: theme.palette.primary.main,
-                  },
-                }}
-              >
-                Comment
-              </Button>
-              <Button
-                fullWidth
-                startIcon={<Share />}
-                sx={{
-                  textTransform: "none",
-                  color: theme.palette.text.secondary,
-                  borderRadius: 2,
-                  "&:hover": {
-                    bgcolor: alpha(theme.palette.success.main, 0.08),
-                    color: theme.palette.success.main,
-                  },
-                }}
-              >
-                Share
-              </Button>
-            </Stack>
-          </CardActions>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (type === "photos") {
-    return (
-      <Card
-        elevation={0}
-        sx={{
-          borderRadius: 3,
-          overflow: "hidden",
-          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-          transition: "all 0.2s ease-in-out",
-          "&:hover": {
-            transform: "translateY(-2px)",
-            boxShadow: theme.shadows[4],
-            borderColor: alpha(theme.palette.primary.main, 0.3),
-            "& .photo-overlay": {
-              opacity: 1,
-            },
-          },
-        }}
-      >
-        {/* Photo */}
-        <Box sx={{ position: "relative" }}>
-          <CardMedia
-            component="img"
-            image={result.image}
-            alt={result.title}
-            sx={{
-              width: "100%",
-              height: 200,
-              objectFit: "cover",
-            }}
-          />
-          <Box
-            className="photo-overlay"
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              bgcolor: alpha(theme.palette.common.black, 0.4),
-              opacity: 0,
-              transition: "opacity 0.3s ease-in-out",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Button
-              variant="contained"
-              startIcon={<Photo />}
+          {result.type === "VID" && (
+            <Box
               sx={{
-                textTransform: "none",
-                fontWeight: 600,
                 borderRadius: 2,
-                bgcolor: "white",
-                color: "black",
-                "&:hover": {
-                  bgcolor: alpha(theme.palette.common.white, 0.9),
-                },
+                overflow: "hidden",
+                mb: 2,
+                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
               }}
             >
-              View Photo
-            </Button>
-          </Box>
-        </Box>
-
-        {/* Photo Info */}
-        <CardContent sx={{ p: 2.5 }}>
-          <Stack spacing={1.5}>
-            <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
-                {result.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                By {result.author?.name}
-              </Typography>
+              <VideoPlayer
+                src={`${api.getUri()}/../storage/${result.post_content}`}
+              />
             </Box>
-
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <CalendarToday
-                  sx={{ fontSize: 14, color: theme.palette.text.secondary }}
-                />
-                <Typography variant="caption" color="text.secondary">
-                  {result.time}
-                </Typography>
-              </Box>
-              <Stack direction="row" spacing={1}>
-                <IconButton size="small">
-                  <Favorite sx={{ fontSize: 18 }} />
-                </IconButton>
-                <IconButton size="small">
-                  <Bookmark sx={{ fontSize: 18 }} />
-                </IconButton>
-                <IconButton size="small">
-                  <Share sx={{ fontSize: 18 }} />
-                </IconButton>
-              </Stack>
-            </Stack>
-          </Stack>
+          )}
         </CardContent>
       </Card>
     );
   }
-
-  if (type === "groups") {
-    return (
-      <Card
-        elevation={0}
-        sx={{
-          borderRadius: 3,
-          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-          transition: "all 0.2s ease-in-out",
-          "&:hover": {
-            transform: "translateY(-2px)",
-            boxShadow: theme.shadows[4],
-            borderColor: alpha(theme.palette.primary.main, 0.3),
-          },
-        }}
-      >
-        <CardContent sx={{ p: 3 }}>
-          <Stack spacing={3}>
-            {/* Group Header */}
-            <Stack direction="row" spacing={3}>
-              <Box
-                sx={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 3,
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Group
-                  sx={{
-                    fontSize: 40,
-                    color: theme.palette.primary.main,
-                  }}
-                />
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                  {result.name}
-                </Typography>
-                <Stack direction="row" spacing={2} sx={{ mb: 1.5 }}>
-                  <Chip
-                    icon={
-                      result.privacy === "Public group" ? <Public /> : <Lock />
-                    }
-                    label={result.privacy}
-                    size="small"
-                    variant="outlined"
-                    sx={{
-                      fontWeight: 500,
-                      borderRadius: 1,
-                    }}
-                  />
-                  <Chip
-                    icon={<People />}
-                    label={`${result.members} members`}
-                    size="small"
-                    variant="outlined"
-                    sx={{
-                      fontWeight: 500,
-                      borderRadius: 1,
-                    }}
-                  />
-                </Stack>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ lineHeight: 1.6 }}
-                >
-                  {result.description}
-                </Typography>
-              </Box>
-            </Stack>
-
-            {/* Action Buttons */}
-            <CardActions sx={{ p: 0 }}>
-              <Stack direction="row" spacing={1.5} sx={{ width: "100%" }}>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  startIcon={<Group />}
-                  sx={{
-                    textTransform: "none",
-                    fontWeight: 600,
-                    borderRadius: 2,
-                    py: 1.5,
-                    bgcolor: theme.palette.primary.main,
-                    "&:hover": {
-                      bgcolor: theme.palette.primary.dark,
-                    },
-                  }}
-                >
-                  Join Group
-                </Button>
-                <Button
-                  variant="outlined"
-                  fullWidth
-                  startIcon={<Message />}
-                  sx={{
-                    textTransform: "none",
-                    fontWeight: 500,
-                    borderRadius: 2,
-                    py: 1.5,
-                    borderColor: alpha(theme.palette.divider, 0.5),
-                    color: theme.palette.text.primary,
-                    "&:hover": {
-                      borderColor: theme.palette.primary.main,
-                      bgcolor: alpha(theme.palette.primary.main, 0.04),
-                    },
-                  }}
-                >
-                  View Details
-                </Button>
-              </Stack>
-            </CardActions>
-          </Stack>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return null;
 };
 

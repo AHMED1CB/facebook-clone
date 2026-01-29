@@ -4,16 +4,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { getVideos } from "../../App/Redux/Features/Posts/Services";
 import CommentsModal from "../Comments/Modal";
+import Loader from "../Loader/Loader";
 
 const Videos = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
-  const mainVideos = useSelector((s) => s.posts.videos) || []; 
+  const mainVideos = useSelector((s) => s.posts.videos) || [];
 
-  const [videos, setVideos] = useState([]); 
+  const [videos, setVideos] = useState([]);
   const [openComments, setOpenComments] = useState(false);
   const [activePost, setActivePost] = useState(null);
-
+  const { state } = useSelector((s) => s.posts);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const isFetchingRef = useRef(false);
@@ -25,6 +26,7 @@ const Videos = () => {
       setVideos([...mainVideos]);
     }
   }, [dispatch, mainVideos]);
+
   const loadMoreVideos = useCallback(
     async (currentIndex) => {
       if (!hasMore || isFetchingRef.current) return;
@@ -40,7 +42,7 @@ const Videos = () => {
       if (newVideos.length === 0) {
         setHasMore(false);
       } else {
-        setVideos((prev) => [...prev, ...newVideos]); 
+        setVideos((prev) => [...prev, ...newVideos]);
         setPage(nextPage);
       }
 
@@ -78,32 +80,34 @@ const Videos = () => {
   );
 
   return (
-    <Box
-      sx={{
-        minHeight: "95vh",
-        bgcolor: theme.palette.background.default,
-        pt: 2,
-      }}
-    >
-      <Container maxWidth="lg">
-        <VideosList
-          videos={videos}
-          setOpen={setOpenComments}
-          setActivePost={setActivePost}
-          onEndReached={loadMoreVideos}
-        />
-      </Container>
+    (videos?.length === 0 && state === "Loading" && <Loader />) || (
+      <Box
+        sx={{
+          minHeight: "95vh",
+          bgcolor: theme.palette.background.default,
+          pt: 2,
+        }}
+      >
+        <Container maxWidth="lg">
+          <VideosList
+            videos={videos}
+            setOpen={setOpenComments}
+            setActivePost={setActivePost}
+            onEndReached={loadMoreVideos}
+          />
+        </Container>
 
-      {activePost && (
-        <CommentsModal
-          open={openComments}
-          onClose={() => setOpenComments(false)}
-          post={activePost}
-          onComment={handleComment}
-          onDelete={handleDelete}
-        />
-      )}
-    </Box>
+        {activePost && (
+          <CommentsModal
+            open={openComments}
+            onClose={() => setOpenComments(false)}
+            post={activePost}
+            onComment={handleComment}
+            onDelete={handleDelete}
+          />
+        )}
+      </Box>
+    )
   );
 };
 

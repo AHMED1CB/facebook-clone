@@ -53,7 +53,7 @@ const Home = () => {
 
   const user = useSelector((s) => s.auth.user);
   const friends = user.friends;
-  const { state, error } = useSelector((s) => s.posts);
+  const { state } = useSelector((s) => s.posts);
   const posts = useSelector((s) => s.posts.posts || []);
 
   const [page, setPage] = useState(1);
@@ -118,14 +118,6 @@ const Home = () => {
     setShowEditModal(true);
   }, []);
 
-  const handleRefresh = () => {
-    setPage(1);
-    setHasMore(true);
-    setPosts([]);
-    setIsLoadingMore(true);
-    dispatch(getPosts(1));
-  };
-
   return (
     <PostContext.Provider
       value={{
@@ -144,7 +136,6 @@ const Home = () => {
           overflowX: "hidden",
         }}
       >
-        {/* Mobile Header */}
         <Box
           sx={{
             display: { xs: "flex", md: "none" },
@@ -243,48 +234,23 @@ const Home = () => {
             >
               <Box
                 sx={{
-                  top: { xs: 56, md: 84 },
+                  display: { xs: "none", md: "block" },
                   zIndex: 10,
                   width: "100%",
                   borderRadius: 2,
                   border: `1px solid ${theme.palette.divider}`,
-                  mt: { sm: 10, lg: 0 },
                   mb: 3,
                 }}
               >
                 <CreatePost setOpen={setOpen} />
               </Box>
 
-              {/* Error State */}
-              {error && (
-                <MuiAlert
-                  severity="error"
-                  sx={{
-                    mb: 3,
-                    borderRadius: 2,
-                    alignItems: "center",
-                  }}
-                  action={
-                    <Button
-                      size="small"
-                      onClick={handleRefresh}
-                      startIcon={<Refresh />}
-                      sx={{ fontWeight: 600 }}
-                    >
-                      Retry
-                    </Button>
-                  }
-                >
-                  Failed to load posts. Please try again.
-                </MuiAlert>
-              )}
-
-              {/* Posts Section */}
               <Box
                 sx={{
                   display: "flex",
                   flexDirection: "column",
                   gap: 3,
+                  mt:{sm:10 , md:0}
                 }}
               >
                 <Posts
@@ -397,7 +363,6 @@ const Home = () => {
               </Box>
             </Grid>
 
-            {/* Desktop Contacts - Hidden on mobile */}
             <Grid
               item
               md={3}
@@ -431,7 +396,6 @@ const Home = () => {
             </Grid>
           </Grid>
 
-          {/* Mobile Drawers */}
           <Drawer
             anchor="left"
             open={mobileSidebarOpen}
@@ -516,7 +480,6 @@ const Home = () => {
               zIndex: 1000,
             }}
           >
-            {/* Scroll to top FAB */}
             <Zoom in={trigger}>
               <Fab
                 size="medium"

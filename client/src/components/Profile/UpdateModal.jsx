@@ -105,13 +105,11 @@ const UpdateModal = ({ open, onClose, userData }) => {
     reader.onload = (ev) => setCoverPreview(ev.target.result);
     reader.readAsDataURL(file);
   };
-
   const handleProfileUpdate = async () => {
     if (!data.name.trim() || data.name.trim().length < 3) {
       Alert.error("Invalid Data", "Name must be at least 3 letters");
       return;
     }
-
     const formData = new FormData();
     formData.append("name", data.name.trim());
     formData.append("location", data.location.trim());
@@ -134,24 +132,25 @@ const UpdateModal = ({ open, onClose, userData }) => {
 
     setIsLoading(false);
     dispatch(setUser(newUser));
-
     onClose();
   };
 
   return (
-    <Modal open={open} closeAfterTransition>
+    <Modal open={open} closeAfterTransition onClose={onClose}>
       <Fade in={open}>
         <Paper
           sx={{
             width: "100%",
             maxWidth: 700,
-            maxHeight: "90vh",
+            maxHeight: "80vh",
             overflow: "auto",
             borderRadius: 3,
-            mx: "auto",
+            m: "auto",
+            top:'50%',
+            position:'relative',
+            transform:'translateY(-50%)'
           }}
         >
-          {/* Header */}
           <Box sx={{ p: 3, bgcolor: "primary.main", color: "#fff" }}>
             <Box display="flex" justifyContent="space-between">
               <Typography variant="h5" fontWeight="700">
@@ -202,7 +201,6 @@ const UpdateModal = ({ open, onClose, userData }) => {
               />
             </Box>
 
-            {/* Avatar (unchanged) */}
             <Box textAlign="center" mb={4}>
               <Avatar
                 src={displayedImage}
@@ -223,7 +221,6 @@ const UpdateModal = ({ open, onClose, userData }) => {
 
             <Divider sx={{ mb: 4 }} />
 
-            {/* Fields */}
             <Grid container spacing={2.5}>
               {profileFields.map((field) => (
                 <TextField

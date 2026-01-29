@@ -105,7 +105,7 @@ const VideoCard = (props) => {
         sx={{
           position: "relative",
           width: "100%",
-          height: "95vh",
+          height: "100vh",
           bgcolor: "black",
           overflow: "hidden",
           cursor: "pointer",

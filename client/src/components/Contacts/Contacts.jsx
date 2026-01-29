@@ -9,15 +9,12 @@ import {
   Avatar,
   Badge,
   Divider,
-  useTheme,
 } from "@mui/material";
-import {
-  Search as SearchIcon,
-  MoreHoriz as MoreHorizIcon,
-} from "@mui/icons-material";
 import api from "../../App/services/api";
+import { useNavigate } from "react-router-dom";
 
 export default ({ contacts }) => {
+  const go = useNavigate();
   return (
     <Box sx={{ position: "sticky", top: 72 }}>
       <Divider sx={{ my: 2 }} />
@@ -38,14 +35,6 @@ export default ({ contacts }) => {
         >
           Contacts
         </Typography>
-        <Box>
-          <IconButton size="small">
-            <SearchIcon fontSize="small" />
-          </IconButton>
-          <IconButton size="small">
-            <MoreHorizIcon fontSize="small" />
-          </IconButton>
-        </Box>
       </Box>
       <List>
         {contacts.map((contact, index) => {
@@ -61,7 +50,11 @@ export default ({ contacts }) => {
             </Avatar>
           );
           return (
-            <ListItemButton key={index} sx={{ borderRadius: 2, mb: 0.5 }}>
+            <ListItemButton
+              key={index}
+              sx={{ borderRadius: 2, mb: 0.5 }}
+              onClick={() => go(`/user/${contact.id}`)}
+            >
               <ListItemAvatar>
                 <Badge
                   overlap="circular"
