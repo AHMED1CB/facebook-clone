@@ -8,23 +8,6 @@ use App\Services\Response;
 
 class FriendsController extends Controller
 {
-    public function getFriendData($friendId)
-    {
-
-        $user = request()->user();
-        $friend = $user->friends()->where('friend_id', $friendId)->with('friend')->first();
-
-
-        if (!$friend) {
-            return Response::json([], "Friend Not Found", 404);
-        }
-
-        return Response::json([
-            'friend' => $friend->friend
-        ], "Friend Found Successfully", 200);
-
-
-    }
 
 
     public function deleteFriend($friendId)

@@ -11,29 +11,23 @@ class RequestsController extends Controller
     public function toggleFriendRequest($targetUserId)
     {
         $myId = request()->user()->id;
-        $targetUserExists = User::where('id', $targetUserId)->where('id', '!=', $myId)->exists();
-
+        $targetUserExists = User::whereId($targetUserId)->whereId('id', '!=', $myId)->exists();
 
         if (!$targetUserExists) {
-            return Response::json([], "Invalid Target User Id", 400);
+            return Response::json([], "The User You Looking For Not Found", 400);
         }
-
 
         $request = Request::where('from_id', $myId)->where('to_id', $targetUserId)->first();
 
         if ($request) {
-
             $request->delete();
             return Response::json([], "Friend Request Deleted Successfully", 200);
-
         }
 
         $isAlreadyFriend = Friend::where('user_id', $myId)->where('friend_id', $targetUserId)
             ->orWhere('user_id', $targetUserId)->where('friend_id', $myId)->exists();
 
         if ($isAlreadyFriend) {
-
-
             return Response::json([], "You Are Already Friends", 400);
         }
 
@@ -41,7 +35,6 @@ class RequestsController extends Controller
             'from_id' => request()->user()->id,
             'to_id' => $targetUserId
         ];
-
 
         $request = Request::create($data);
 
@@ -63,18 +56,14 @@ class RequestsController extends Controller
 
         $request->delete();
 
-        // insert Friend
+        $ids = [
+            $senderId,
+            $myId,
+        ];
 
-        Friend::create([
-            'user_id' => $senderId,
-            'friend_id' => $myId,
-        ]);
+        Friend::create(['user_id' => $ids[0], 'friend_id' => $ids[1]]);
+        Friend::create(['user_id' => $ids[1], 'friend_id' => $ids[0]]);
 
-
-        Friend::create([
-            'friend_id' => $senderId,
-            'user_id' => $myId,
-        ]);
 
         return Response::json([], "Friend Request Accepted Successfully", 200);
 
@@ -91,10 +80,7 @@ class RequestsController extends Controller
             return Response::json([], "There is no Recived Requests From this User", 400);
         }
 
-
-
         $request->delete();
-
 
         return Response::json([], "Friend Request Rejected Successfully", 200);
 

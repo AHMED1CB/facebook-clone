@@ -1,16 +1,16 @@
 <?php
-
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\FriendsController;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RequestsController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 
+// @@@@ TIME LIMITING @@@@
 Route::middleware('throttle.json:80,1')->group(function () {
+    // @@@@ AUTH  @@@@
 
     Route::prefix('auth')->group(function () {
 
@@ -18,7 +18,7 @@ Route::middleware('throttle.json:80,1')->group(function () {
 
             Route::get('user', [AuthController::class, 'getUserDetails']);
             Route::post('logout', [AuthController::class, 'logoutUser']);
-            Route::post('user/edit', [ProfileController::class, 'editProfile']);
+            Route::post('user/edit', [AuthController::class, 'editProfile']);
         });
 
         Route::post('register', [AuthController::class, 'register']);
@@ -26,8 +26,12 @@ Route::middleware('throttle.json:80,1')->group(function () {
 
     });
 
+    // @@@@ USERS  @@@@
+
     Route::get('/users/{id}', [UsersController::class, 'getUser'])->middleware('auth.facebook');
 
+
+    // @@@@ REQUESTS  @@@@
 
     Route::prefix('requests')->middleware('auth.facebook')->controller(RequestsController::class)->group(function () {
 
@@ -37,18 +41,17 @@ Route::middleware('throttle.json:80,1')->group(function () {
 
         Route::post('/{userId}/reject', 'rejectFriendRequest');
 
-
-
     });
 
+    // @@@@ FRIENDS  @@@@
 
     Route::prefix('friends')->middleware('auth.facebook')->controller(FriendsController::class)->group(function () {
 
-        Route::get('/{userId}/', 'getFriendData');
         Route::delete('/{userId}/', 'deleteFriend');
 
     });
 
+    // @@@@ POSTS AND VIDEOS  @@@@
 
     Route::prefix('posts')->middleware('auth.facebook')->controller(PostController::class)->group(function () {
 
@@ -67,19 +70,17 @@ Route::middleware('throttle.json:80,1')->group(function () {
     });
 
 
+    // @@@@ COMMENTS @@@@
+
     Route::prefix('comments')->middleware('auth.facebook')->controller(CommentsController::class)->group(function () {
-
         Route::post('/{postId}', 'commentOnPost');
-
         Route::delete('/{commentId}', 'deleteComment');
-
 
     });
 
-
+    // @@@@ SEARCH  @@@@
 
     Route::get('/search/{query}', [DataController::class, 'search'])->middleware('auth.facebook');
-
 
 });
 

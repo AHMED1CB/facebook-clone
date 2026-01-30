@@ -36,8 +36,6 @@ class AuthController extends Controller
 
     function register()
     {
-
-
         /* 
 
             name *
@@ -64,16 +62,23 @@ class AuthController extends Controller
         }
 
 
-        User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password'])
         ]);
 
 
+        $joiningPostDetails = [
+            'post_content' => "\nHello There im new At Facebook\n",
+            'post_type' => 'TXT',
+            'user_id' => $user->id,
+            'post_privacy' => 'PUB'
+        ];
+
+        $user->posts()->create(($joiningPostDetails));
+
         return Response::json([], 'User registered successfully', 201);
-
-
     }
 
 
@@ -125,5 +130,64 @@ class AuthController extends Controller
         return Response::json([], 'User Logout Successfully', 200);
     }
 
+    public function editProfile()
+    {
+
+        $user = request()->user();
+
+        $dataToEdit = ['name', 'location', 'state', 'bio'];
+        $files = ['photo', 'cover'];
+
+
+        $check = Validator::make(request()->only(array_merge(
+            $dataToEdit,
+            $files
+        )), [
+            'name' => ['nullable', 'string', 'max:255', 'min:3'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'state' => ['nullable', 'string', 'max:255'],
+            'photo' => ['max:20480', 'image', 'mimes:jpg,png,jpeg,gif,svg,webp'],
+            'cover' => ['max:20480', 'image', 'mimes:jpg,png,jpeg,gif,svg,webp'],
+            'bio' => ['max:255'],
+        ]);
+
+
+        if ($check->fails()) {
+
+            return Response::json([
+                'errors' => $check->errors()
+            ], "Invalid Profile Data", 400);
+
+        }
+
+
+        $data = [];
+
+        foreach ($dataToEdit as $key) {
+            if (request()->has($key)) {
+                $data[$key] = request()->input($key);
+            }
+        }
+
+        foreach ($files as $key) {
+            if (request()->hasFile($key)) {
+
+
+                $path = request()->file($key)->store('users', 'public');
+
+                $data[$key] = $path;
+
+            }
+        }
+
+
+        $user->update($data);
+
+
+        return Response::json([
+            'user' => $user->fresh()
+        ], "User Updated Successfully", 200);
+
+    }
 
 }
