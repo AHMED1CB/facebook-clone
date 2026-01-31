@@ -16,6 +16,7 @@ import Settings from "./components/Settings/Settings";
 import { Provider } from "react-redux";
 import { store } from "./App/Redux/Store";
 import User from "./components/User/User";
+import PostPage from "./components/Posts/PostPage";
 
 function App() {
   const [mode, setMode] = useState(localStorage.mode ?? "light");
@@ -36,6 +37,7 @@ function App() {
                 <Route path="search/:query" element={<SearchResults />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="user/:id" element={<User />} />
+                <Route path="post/:id" element={<PostPage />} />
               </Route>
 
               <Route path="/auth">
