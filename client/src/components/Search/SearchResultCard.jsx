@@ -18,9 +18,11 @@ import {
 } from "@mui/icons-material";
 import api from "../../App/services/api";
 import VideoPlayer from "../Posts/VideoPlayer";
+import { useNavigate } from "react-router-dom";
 
 const SearchResultCard = ({ result }) => {
   const theme = useTheme();
+  const go = useNavigate();
   const getInitials = (name) => {
     return name
       ?.split(" ")
@@ -33,6 +35,7 @@ const SearchResultCard = ({ result }) => {
   if (result.type === "people") {
     return (
       <Card
+        onClick={() => go(`/user/${result.id}`)}
         elevation={0}
         sx={{
           borderRadius: 3,
@@ -128,7 +131,6 @@ const SearchResultCard = ({ result }) => {
           },
         }}
       >
-        
         <CardContent sx={{ p: 3, pb: 2 }}>
           <Stack direction="row" spacing={2} alignItems="flex-start">
             <Avatar
@@ -175,7 +177,10 @@ const SearchResultCard = ({ result }) => {
                     </Typography>
                   </Box>
                 </Box>
-                <IconButton size="small">
+                <IconButton
+                  size="small"
+                  onClick={() => go(`/post/${result.id}`)}
+                >
                   <OpenInNew />
                 </IconButton>
               </Stack>
@@ -193,7 +198,8 @@ const SearchResultCard = ({ result }) => {
               color: theme.palette.text.primary,
             }}
           >
-            {result.subtext}
+            {result.subtext ||
+              (result.post_type == "TXT" && result.post_content)}
           </Typography>
 
           {result.type === "IMG" && (

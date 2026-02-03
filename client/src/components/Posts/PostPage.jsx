@@ -192,7 +192,7 @@ const PostPage = () => {
 
         <CardContent sx={{ padding: theme.spacing(0, 2, 2, 2) }}>
           <Typography variant="body1" paragraph sx={{ fontSize: "0.9375rem" }}>
-            {post.subtext}
+            {post.subtext || (post.post_type === "TXT" && post.post_content)}
           </Typography>
 
           {renderPostContent()}

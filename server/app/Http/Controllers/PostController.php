@@ -16,20 +16,21 @@ class PostController extends Controller
     {
         $userId = request()->user()->id;
         $friendsIds = request()->user()->friends()->pluck('id');
-        $targetPost = Post::where('id', $postId)->where(function ($q) use ($userId, $friendsIds) {
-            $q->where('post_privacy', 'PUB')
-                ->orWhere(function ($q) use ($userId) {
-                    $q->where('post_privacy', 'PRIV')
-                        ->where('user_id', $userId);
-                })
-                ->orWhere(function ($q) use ($friendsIds) {
-                    $q->where('post_privacy', 'FRI')
-                        ->whereIn('user_id', $friendsIds);
-                });
-        })->with('comments.user', 'user')->withCount('likes', 'comments')
+
+        $targetPost = Post::where('id', $postId)
+            ->where(function ($q) use ($userId, $friendsIds) {
+                $q->where('user_id', $userId) // صاحب البوست دائمًا مسموح له
+                    ->orWhere('post_privacy', 'PUB')
+                    ->orWhere(function ($q) use ($friendsIds) {
+                        $q->where('post_privacy', 'FRI')
+                            ->whereIn('user_id', $friendsIds);
+                    });
+            })
+            ->with('comments.user', 'user')
+            ->withCount('likes', 'comments')
             ->withExists([
                 'likes as isLiked' => function ($q) use ($userId) {
-                    return $q->where('user_id', $userId);
+                    $q->where('user_id', $userId);
                 }
             ])
             ->first();
@@ -41,9 +42,8 @@ class PostController extends Controller
         return Response::json([
             'post' => $targetPost
         ], "Post Found Successfully", 200);
-
-
     }
+
 
 
     public function getSomeVideos()

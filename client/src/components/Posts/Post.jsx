@@ -75,13 +75,13 @@ export default ({
         }
         break;
       case "share":
-        // Share functionality
-        break;
-      case "report":
-        // Report functionality
-        break;
-      case "save":
-        // Save functionality
+        try {
+          let text = `${location.host}/post/${post.id}`;
+          await navigator.clipboard.writeText(text);
+          Alert.info("Link Copied Successfully");
+        } catch {
+          Alert.error("Failed to Copy");
+        }
         break;
       default:
         break;
@@ -143,23 +143,35 @@ export default ({
       onMouseLeave={handleMouseLeave}
     >
       <CardHeader
-        onClick={() => authUser.id !== user.id && go(`/user/${user.id}`)}
         avatar={profileImage}
         action={
           <Box>
-            {post.post_type !== "TXT" && post.post_type && (
-              <Chip
-                label={post.post_type}
-                size="small"
-                sx={{
-                  mr: 1,
-                  bgcolor: theme.palette.primary.main + "15",
-                  color: theme.palette.primary.main,
-                  fontWeight: 500,
-                  fontSize: "0.7rem",
-                }}
-              />
-            )}
+            {
+              <>
+                <Chip
+                  label={post.post_type}
+                  size="small"
+                  sx={{
+                    mr: 1,
+                    bgcolor: theme.palette.primary.main + "15",
+                    color: theme.palette.primary.main,
+                    fontWeight: 500,
+                    fontSize: "0.7rem",
+                  }}
+                />
+                <Chip
+                  label={post.post_privacy}
+                  size="small"
+                  sx={{
+                    mr: 1,
+                    bgcolor: theme.palette.error.main + "15",
+                    color: theme.palette.error.light,
+                    fontWeight: 500,
+                    fontSize: "0.7rem",
+                  }}
+                />
+              </>
+            }
             <IconButton
               onClick={handleMenuClick}
               aria-label="post options"
@@ -236,34 +248,6 @@ export default ({
                   primaryTypographyProps={{ variant: "body2" }}
                 />
               </MenuItem>
-
-              <MenuItem
-                onClick={() => handleMenuItemClick("save")}
-                sx={{ py: 1.2 }}
-              >
-                <ListItemIcon>
-                  <BookmarkBorderIcon fontSize="small" color="action" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Save Post"
-                  primaryTypographyProps={{ variant: "body2" }}
-                />
-              </MenuItem>
-
-              {user.id !== authUser.id && (
-                <MenuItem
-                  onClick={() => handleMenuItemClick("report")}
-                  sx={{ py: 1.2 }}
-                >
-                  <ListItemIcon>
-                    <ReportIcon fontSize="small" color="warning" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Report"
-                    primaryTypographyProps={{ variant: "body2" }}
-                  />
-                </MenuItem>
-              )}
             </Menu>
           </Box>
         }
@@ -271,7 +255,13 @@ export default ({
           <Box>
             <Typography
               variant="subtitle1"
-              sx={{ fontWeight: 700, fontSize: "1rem" }}
+              sx={{
+                fontWeight: 700,
+                fontSize: "1rem",
+                width: "fit-content",
+                cursor: "pointer",
+              }}
+              onClick={() => authUser.id !== user.id && go(`/user/${user.id}`)}
             >
               {user.name}
             </Typography>
