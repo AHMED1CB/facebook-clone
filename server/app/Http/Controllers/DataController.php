@@ -19,7 +19,7 @@ class DataController extends Controller
 
         $userId = request()->user()->id;
 
-        $posts = Post::where('post_content', 'LIKE', "%{$query}%")->with('comments.user', 'user')->withCount('likes', 'comments')->withExists([
+        $posts = Post::where('post_privacy', 'PUB')->where('post_content', 'LIKE', "%{$query}%")->with('comments.user', 'user')->withCount('likes', 'comments')->withExists([
             'likes as isLiked' => function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             }
